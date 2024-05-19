@@ -1,0 +1,9 @@
+{
+  "name": "Introspection helper extension",
+  "description": "회고 쓰는 걸 도와주는 익스텐션.",
+  "version": "1.0",
+  "manifest_version": 3,
+  "action":{
+    "default_popup": "main.html"
+  }
+}
