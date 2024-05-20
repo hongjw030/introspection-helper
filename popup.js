@@ -4,7 +4,6 @@ document.addEventListener('DOMContentLoaded', function() {
       document.getElementById('login').style.display = 'none';
       document.getElementById('logout').style.display = 'block';
       document.getElementById('ownerSection').style.display = 'flex';
-      document.getElementById('postSection').style.display = 'flex';
       if (result.selectedRepo) {
         showSelectedRepo(result.selectedRepo);
         document.getElementById('selectedRepoP').style.display = 'flex';
@@ -65,16 +64,15 @@ document.addEventListener('DOMContentLoaded', function() {
   });
 
   document.getElementById('logout').addEventListener('click', function() {
-    chrome.storage.local.remove(['githubToken', 'selectedRepo'], function() {
+    chrome.storage.local.remove(['githubToken', 'selectedRepo', 'ownerName'], function() {
       document.getElementById('login').style.display = 'block';
       document.getElementById('logout').style.display = 'none';
       document.getElementById('ownerSection').style.display = 'none';
       document.getElementById('repoSection').style.display = 'none';
       document.getElementById('postSection').style.display = 'none';
     });
-    chrome.storage.local.remove('ownerName', function(){
-      console.log('Owner name removed');
-    })
+    let token = chrome.storage.local.get('githubToken');
+    console.log(token)
   });
 
   document.getElementById('submitPost').addEventListener('click', function() {
