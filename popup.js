@@ -166,6 +166,11 @@ function showOwnerName(ownerName) {
   ownerNameSpan.innerHTML = ownerName;
 }
 
+function encodeBase64(input) {
+  const utf8Bytes = new TextEncoder().encode(input);
+  return btoa(String.fromCharCode(...utf8Bytes));
+}
+
 function createFileAndCommit(token, repoName, fileName, content, ownerName) {
   let latestCommitSha; // latestCommitSha 변수를 함수 내에서 선언
 
@@ -177,8 +182,8 @@ function createFileAndCommit(token, repoName, fileName, content, ownerName) {
         'Content-Type': 'application/json'
       },
       body: JSON.stringify({
-        message: 'Create new Markdown file',
-        content: btoa(content) // encode content to base64
+        message: 'feat: Create new Introspection file',
+        content: encodeBase64(content) // encode content to base64
       })
     })
     .then(response => {
@@ -252,7 +257,7 @@ function createFileAndCommit(token, repoName, fileName, content, ownerName) {
           path: fileName,
           mode: '100644',
           type: 'blob',
-          content: btoa(content) // encode content to base64
+          content: encodeBase64(content) // encode content to base64
         }]
       })
     });
