@@ -24,7 +24,7 @@ document.addEventListener('DOMContentLoaded', function() {
 
   document.getElementById('login').addEventListener('click', function() {
     const redirectUri = chrome.identity.getRedirectURL();
-    const authUrl = `https://github.com/login/oauth/authorize?client_id=${process.env.YOUR_GITHUB_CLIENT_ID}&redirect_uri=${encodeURIComponent(redirectUri)}&scope=repo`;
+    const authUrl = `https://github.com/login/oauth/authorize?client_id=Ov23liS8uJ1LJSioNTPc&redirect_uri=${encodeURIComponent(redirectUri)}&scope=repo`;
 
     chrome.identity.launchWebAuthFlow({
       url: authUrl,
@@ -45,8 +45,8 @@ document.addEventListener('DOMContentLoaded', function() {
           'Content-Type': 'application/json'
         },
         body: JSON.stringify({
-          client_id: process.env.YOUR_GITHUB_CLIENT_ID,
-          client_secret: process.env.YOUR_GITHUB_CLIENT_SECRET,
+          client_id: 'Ov23liS8uJ1LJSioNTPc',
+          client_secret: '904fcc78be315af16780349f2f74d701aeb3fd34',
           code: code,
           redirect_uri: redirectUri
         })
