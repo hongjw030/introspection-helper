@@ -3,6 +3,8 @@ document.addEventListener('DOMContentLoaded', function() {
     if (result.githubToken) {
       document.getElementById('login').style.display = 'none';
       document.getElementById('logout').style.display = 'block';
+      document.getElementById('ownerSection').style.display = 'flex';
+      document.getElementById('postSection').style.display = 'flex';
       if (result.selectedRepo) {
         showSelectedRepo(result.selectedRepo);
         document.getElementById('selectedRepoP').style.display = 'flex';
@@ -66,11 +68,9 @@ document.addEventListener('DOMContentLoaded', function() {
     chrome.storage.local.remove(['githubToken', 'selectedRepo'], function() {
       document.getElementById('login').style.display = 'block';
       document.getElementById('logout').style.display = 'none';
+      document.getElementById('ownerSection').style.display = 'none';
       document.getElementById('repoSection').style.display = 'none';
-      document.getElementById('repoList').innerHTML = '';
-      document.getElementById('selectedRepo').innerHTML = '';
       document.getElementById('postSection').style.display = 'none';
-      document.getElementById('postInput').value = '';
     });
     chrome.storage.local.remove('ownerName', function(){
       console.log('Owner name removed');
@@ -156,7 +156,8 @@ function fetchRepos(token) {
 }
 
 function showSelectedRepo(repoName) {
-  document.getElementById('repoList').innerHTML = '';
+  document.getElementById('repoSection').style.display='none';
+  document.getElementById('ownerSection').style.display='flex';
   const selectedRepoSpan = document.getElementById('selectedRepoSpan');
   selectedRepoSpan.innerHTML = repoName;
 }
@@ -304,7 +305,7 @@ function createFileAndCommit(token, repoName, fileName, content, ownerName) {
     })
     .then(response => {
       if (response.status === 201) {
-        console.log(`파일 ${fileName}이(가) 생성되었습니다.`);
+        alert(`파일 ${fileName}이(가) 생성되었습니다.`);
         document.getElementById('postInput').value = '';
       } else {
         throw new Error('Failed to create file');
