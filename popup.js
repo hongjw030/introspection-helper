@@ -1,11 +1,17 @@
 document.addEventListener('DOMContentLoaded', function() {
-  chrome.storage.local.get(['githubToken', 'selectedRepo'], function(result) {
+  chrome.storage.local.get(['githubToken', 'selectedRepo', 'ownerName'], function(result) {
     if (result.githubToken) {
       document.getElementById('login').style.display = 'none';
       document.getElementById('logout').style.display = 'block';
       if (result.selectedRepo) {
         showSelectedRepo(result.selectedRepo);
         document.getElementById('postSection').style.display = 'block';
+        if (result.ownerName) {
+          showOwnerName(result.ownerName);
+          document.getElementById('ownerNameSection').style.display = 'block';
+        } else {
+          fetchRepos(result.githubToken);
+        }
       } else {
         fetchRepos(result.githubToken);
       }
@@ -85,7 +91,8 @@ document.addEventListener('DOMContentLoaded', function() {
           return;
         }
         const content = document.getElementById('postInput').value;
-        const fileName = 'post.md';
+
+        const fileName = `${getCurrentDate()}.md`;
         chrome.storage.local.get('ownerName', function(ownerResult){
           const ownerName = ownerResult.ownerName;
           if (!ownerName){
@@ -98,6 +105,15 @@ document.addEventListener('DOMContentLoaded', function() {
     });
   });
 });
+
+function getCurrentDate() {
+  const today = new Date();
+  const year = today.getFullYear();
+  let month = (today.getMonth() + 1).toString().padStart(2, '0'); // 월은 0부터 시작하므로 +1 필요
+  let day = today.getDate().toString().padStart(2, '0');
+
+  return `${year}${month}${day}`;
+}
 
 function fetchOwnerName(token) {
   console.log(token);
@@ -145,6 +161,12 @@ function showSelectedRepo(repoName) {
   selectedRepo.style.display = 'block';
 }
 
+function showOwnerName(ownerName) {
+  const ownerNameSection = document.getElementById('ownerNameSection');
+  ownerNameSection.innerHTML = `ownerName is: ${ownerName}`;
+  ownerNameSection.style.display = 'block';
+}
+
 function createFileAndCommit(token, repoName, fileName, content, ownerName) {
   let latestCommitSha; // latestCommitSha 변수를 함수 내에서 선언
   fetch(`https://api.github.com/repos/${ownerName}/${repoName}/contents/${fileName}`, {
@@ -159,11 +181,17 @@ function createFileAndCommit(token, repoName, fileName, content, ownerName) {
     })
   })
   .then(response => {
-    alert(response)
-    console.error(response)
     if (response.status === 201) {
       return response.json();
-    } else {
+    } else if (response.status ===422){
+      const newFileName = prompt("같은 이름의 파일이 존재합니다! 새 파일 이름을 입력해주세요.");
+      if (newFileName){
+        
+      }else{
+        throw new Error("new file name canceled")
+      }
+
+    }else{
       throw new Error('Failed to create file');
     }
   })
