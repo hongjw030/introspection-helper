@@ -1,0 +1,45 @@
+{
+  "manifest_version": 3,
+  "name": "GitHub Introspection Committer",
+  "version": "1.0",
+  "description": "GitHub 레포지토리에 마크다운 파일로 커밋하는 확장 프로그램",
+  "permissions": [
+    "identity",
+    "activeTab",
+    "scripting",
+    "storage",
+    "unlimitedStorage",
+    "declarativeNetRequest",
+    "declarativeNetRequestWithHostAccess"
+  ],
+  "icons": {
+    "16": "assets/icons/signature16.png",
+    "24": "assets/icons/signature24.png",
+    "32": "assets/icons/signature32.png",
+    "64": "assets/icons/signature64.png",
+    "128": "assets/icons/signature128.png",
+    "512": "assets/icons/signature512.png"
+  },
+  "background": {
+    "service_worker": "scripts/background.js"
+  },
+  "action": {
+    "default_icon": "assets/icons/signature32.png",
+    "default_title": "GIC",
+    "default_popup": "popup.html"
+  },
+  "content_scripts": [
+    {
+      "matches": ["<all_urls>"],
+      "js": ["scripts/github/authorize.js", "scripts/github/github.js", "scripts/github/oauth2.js", "popup.js"]
+    }
+  ],
+  "oauth2": {
+    "client_id": "Ov23liS8uJ1LJSioNTPc",
+    "scopes": [
+      "repo"
+    ],
+    "auth_url": "https://github.com/login/oauth/authorize",
+    "redirect_uri": "https://nkmemnehekmfeekceceegmaobidfpghm.chromiumapp.org/"
+  }
+}
