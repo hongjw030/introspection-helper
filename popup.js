@@ -169,33 +169,39 @@ function showOwnerName(ownerName) {
 
 function createFileAndCommit(token, repoName, fileName, content, ownerName) {
   let latestCommitSha; // latestCommitSha 변수를 함수 내에서 선언
-  fetch(`https://api.github.com/repos/${ownerName}/${repoName}/contents/${fileName}`, {
-    method: 'PUT',
-    headers: {
-      Authorization: `token ${token}`,
-      'Content-Type': 'application/json'
-    },
-    body: JSON.stringify({
-      message: 'Create new Markdown file',
-      content: btoa(content) // encode content to base64
-    })
-  })
-  .then(response => {
-    if (response.status === 201) {
-      return response.json();
-    } else if (response.status ===422){
-      const newFileName = prompt("같은 이름의 파일이 존재합니다! 새 파일 이름을 입력해주세요.");
-      if (newFileName){
-        
-      }else{
-        throw new Error("new file name canceled")
-      }
 
-    }else{
-      throw new Error('Failed to create file');
-    }
-  })
-  .then(data => {
+  function createFileAndCommitRecursive(fileName) {
+    return fetch(`https://api.github.com/repos/${ownerName}/${repoName}/contents/${fileName}`, {
+      method: 'PUT',
+      headers: {
+        Authorization: `token ${token}`,
+        'Content-Type': 'application/json'
+      },
+      body: JSON.stringify({
+        message: 'Create new Markdown file',
+        content: btoa(content) // encode content to base64
+      })
+    })
+    .then(response => {
+      if (response.status === 201) {
+        return response.json();
+      } else if (response.status === 422) {
+        // 중복된 파일이 있을 경우 사용자에게 새 파일 이름을 입력받기
+        const newFileName = prompt("같은 이름의 파일이 존재합니다! 새 파일 이름을 입력해주세요.") + ".md";
+        if (newFileName) {
+          // 사용자가 입력한 새 파일 이름이 있는 경우 재귀 호출
+          return createFileAndCommitRecursive(newFileName);
+        } else {
+          // 사용자가 입력을 취소한 경우
+          throw new Error("취소되었습니다.");
+        }
+      } else {
+        throw new Error('Failed to create file');
+      }
+    });
+  }
+
+  return createFileAndCommitRecursive(fileName).then(data => {
     const commitMessage = 'Add new Markdown file';
     const branch = 'main'; // Change to your default branch if needed
     const sha = data.content.sha;
@@ -309,6 +315,6 @@ function createFileAndCommit(token, repoName, fileName, content, ownerName) {
   .catch(error => {
     console.log(error)
   }).finally(()=>{
-    alert("finally alert")
+    alert("finally console!")
   })
 }
