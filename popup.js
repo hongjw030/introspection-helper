@@ -166,72 +166,50 @@ function showOwnerName(ownerName) {
   ownerNameSpan.innerHTML = ownerName;
 }
 
+
 function createFileAndCommit(token, repoName, fileName, content, ownerName) {
-  function encodeBase64(input) {
-    const utf8Bytes = new TextEncoder().encode(input);
-    return btoa(String.fromCharCode(...utf8Bytes));
+  let latestCommitSha; // latestCommitSha 변수를 함수 내에서 선언
+
+  function createFileInFolder(token, repoName, fileName, content, ownerName, folderPath) {
+    fetch(`https://api.github.com/repos/${ownerName}/${repoName}/contents/${folderPath}`, {
+      method: 'GET',
+      headers: {
+        Authorization: `token ${token}`
+      }
+    })
+    .then(response => {
+      if (response.status === 404) {
+        // 폴더가 없으므로 생성
+        return createFolderAndFile(token, repoName, fileName, content, ownerName, folderPath);
+      } else {
+        // 폴더가 이미 존재하므로 파일 생성
+        return createNewFile(token, repoName, fileName, content, ownerName, folderPath);
+      }
+    })
+    .catch(error => {
+      console.error('Error:', error);
+    });
   }
 
-  function handleFileCreation(token, repoName, fileName, content, ownerName) {
-    fetch(`https://api.github.com/repos/${ownerName}/${repoName}/contents/${fileName}`, {
-      method: 'PUT',
-      headers: {
-        Authorization: `token ${token}`,
-        'Content-Type': 'application/json'
-      },
-      body: JSON.stringify({
-        message: 'Create new Introspection',
-        content: encodeBase64(content) // encode content to base64
-      })
-    })
-    .then(response => {
-      if (response.status === 201) {
-        return response.json();
-      } else if (response.status === 422) {
-        throw new Error("file name duplicated");
-      } else {
-        throw new Error('Failed to create file');
-      }
-    })
-    .then(data => {
-      const commitMessage = 'Add new Introspection file';
-      const branch = 'main'; // Change to your default branch if needed
-      const sha = data.content.sha;
+  function createFolderAndFile(token, repoName, fileName, content, ownerName, folderPath) {
+    const folderName = folderPath.split('/').pop();
+    const parentFolder = folderPath.split('/').slice(0, -1).join('/');
+    const folderData = {
+      path: folderPath,
+      message: 'Create new folder',
+      content: btoa(''), // 빈 내용으로 폴더 생성
+      branch: 'main' // 변경 필요 시 수정
+    };
 
-      // Get the latest commit
-      return fetch(`https://api.github.com/repos/${ownerName}/${repoName}/git/refs/heads/${branch}`, {
-        method: 'GET',
-        headers: {
-          Authorization: `token ${token}`
-        }
-      });
-    })
-    .then(response => {
-      if (response.status === 200) {
-        return response.json();
-      } else {
-        throw new Error('Failed to get branch reference');
+    fetch(`https://api.github.com/repos/${ownerName}/${repoName}/contents/${parentFolder}`, {
+      method: 'GET',
+      headers: {
+        Authorization: `token ${token}`
       }
     })
-    .then(refData => {
-      const latestCommitSha = refData.object.sha; // latestCommitSha 변수에 할당
-      return fetch(`https://api.github.com/repos/${ownerName}/${repoName}/git/commits/${latestCommitSha}`, {
-        method: 'GET',
-        headers: {
-          Authorization: `token ${token}`
-        }
-      });
-    })
-    .then(response => {
-      if (response.status === 200) {
-        return response.json();
-      } else {
-        throw new Error('Failed to get latest commit data');
-      }
-    })
-    .then(commitData => {
-      // Create tree
-      const treeSha = commitData.tree.sha;
+    .then(response => response.json())
+    .then(data => {
+      const baseTreeSha = data.sha;
 
       return fetch(`https://api.github.com/repos/${ownerName}/${repoName}/git/trees`, {
         method: 'POST',
@@ -240,27 +218,20 @@ function createFileAndCommit(token, repoName, fileName, content, ownerName) {
           'Content-Type': 'application/json'
         },
         body: JSON.stringify({
-          base_tree: treeSha, // latestCommitSha를 참조
+          base_tree: baseTreeSha,
           tree: [{
-            path: fileName,
-            mode: '100644',
-            type: 'blob',
-            content: encodeBase64(content) // encode content to base64
+            path: folderName,
+            mode: '040000', // 디렉터리 모드
+            type: 'tree',
+            content: '', // 빈 내용
           }]
         })
       });
     })
-    .then(response => {
-      if (response.status === 201) {
-        return response.json();
-      } else {
-        throw new Error('Failed to create tree');
-      }
-    })
-    .then(treeData => {
-      const treeSha = treeData.sha;
+    .then(response => response.json())
+    .then(data => {
+      const newTreeSha = data.sha;
 
-      // Create commit
       return fetch(`https://api.github.com/repos/${ownerName}/${repoName}/git/commits`, {
         method: 'POST',
         headers: {
@@ -268,57 +239,87 @@ function createFileAndCommit(token, repoName, fileName, content, ownerName) {
           'Content-Type': 'application/json'
         },
         body: JSON.stringify({
-          message: commitMessage,
-          parents: [latestCommitSha],
-          tree: treeSha
+          message: 'Create new folder',
+          tree: newTreeSha,
+          parents: []
         })
       });
     })
-    .then(response => {
-      if (response.status === 201) {
-        return response.json();
-      } else {
-        throw new Error('Failed to create commit');
-      }
-    })
-    .then(commitData => {
-      const commitSha = commitData.sha;
+    .then(response => response.json())
+    .then(data => {
+      const newCommitSha = data.sha;
 
-      // Update branch reference
-      return fetch(`https://api.github.com/repos/${ownerName}/${repoName}/git/refs/heads/${branch}`, {
+      return fetch(`https://api.github.com/repos/${ownerName}/${repoName}/git/refs/heads/main`, {
         method: 'PATCH',
         headers: {
           Authorization: `token ${token}`,
           'Content-Type': 'application/json'
         },
         body: JSON.stringify({
-          sha: commitSha,
-          force: false
+          sha: newCommitSha
         })
       });
     })
+    .then(() => {
+      // 폴더 생성 후 파일 생성
+      return createNewFile(token, repoName, fileName, content, ownerName, folderPath);
+    })
+    .catch(error => {
+      console.error('Error:', error);
+    });
+  }
+
+  function createNewFile(token, repoName, fileName, content, ownerName, folderPath) {
+    fetch(`https://api.github.com/repos/${ownerName}/${repoName}/contents/${folderPath}/${fileName}`, {
+      method: 'GET',
+      headers: {
+        Authorization: `token ${token}`
+      }
+    })
     .then(response => {
-      if (response.status === 200) {
-        console.log('Commit created successfully');
+      if (response.status === 404) {
+        // 파일이 존재하지 않으므로 생성
+        return fetch(`https://api.github.com/repos/${ownerName}/${repoName}/contents/${folderPath}/${fileName}`, {
+          method: 'PUT',
+          headers: {
+            Authorization: `token ${token}`,
+            'Content-Type': 'application/json'
+          },
+          body: JSON.stringify({
+            message: 'Create new Markdown file',
+            content: btoa(content) // encode content to base64
+          })
+        });
       } else {
-        throw new Error('Failed to update branch reference');
+        // 파일이 이미 존재하므로 새 파일 이름을 입력받음
+        const newFileName = prompt(`파일 이름 '${fileName}'이 이미 존재합니다. 새 파일 이름을 입력하세요.`);
+        if (newFileName) {
+          // 사용자가 새 파일 이름을 입력한 경우 파일 생성 함수 재귀 호출
+          return createNewFile(token, repoName, newFileName, content, ownerName, folderPath);
+        } else {
+          // 사용자가 입력을 취소한 경우
+          throw new Error('파일 이름 입력이 취소되었습니다.');
+        }
+      }
+    })
+    .then(response => {
+      if (response.status === 201) {
+        console.log(`파일 ${fileName}이(가) 생성되었습니다.`);
+        document.getElementById('postInput').value = '';
+      } else {
+        throw new Error('Failed to create file');
       }
     })
     .catch(error => {
-      if (error.message === "file name duplicated") {
-        const newFileName = prompt("같은 이름의 파일이 존재합니다! 새 파일 이름을 입력하세요:");
-        if (newFileName) {
-          handleFileCreation(token, repoName, newFileName, content, ownerName); // 새 파일 이름으로 다시 시도
-        } else {
-          alert("파일 이름을 입력해야 커밋돼요.");
-        }
-      } else {
-        console.log(error);
-      }
-    }).finally(() => {
-
+      alert("Error: 커밋에 실패했습니다.");
+      console.error('Error:', error);
     });
   }
-  // 처음 파일 생성 시도
-  handleFileCreation(token, repoName, fileName, content, ownerName);
+
+  const currentDate = new Date();
+  const year = currentDate.getFullYear();
+  const month = String(currentDate.getMonth() + 1).padStart(2, '0');
+  const folderPath = `${year}/${month}`;
+
+  createFileInFolder(token, repoName, fileName, content, ownerName, folderPath);
 }
