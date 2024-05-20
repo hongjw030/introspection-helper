@@ -1,8 +1,9 @@
 {
   "manifest_version": 3,
-  "name": "GitHub Introspection Committer",
+  "name": "Introspection Helper",
   "version": "1.0",
-  "description": "GitHub 레포지토리에 마크다운 파일로 커밋하는 확장 프로그램",
+  "description": "input에 회고를 작성하면, 마크다운 파일로 만들어 깃허브 레파지토리에 커밋해줍니다.",
+  "author": "hongjw030",
   "permissions": [
     "identity",
     "activeTab",
@@ -25,13 +26,14 @@
   },
   "action": {
     "default_icon": "assets/icons/signature32.png",
-    "default_title": "GIC",
+    "default_title": "Introspection Helper",
     "default_popup": "popup.html"
   },
   "content_scripts": [
     {
       "matches": ["<all_urls>"],
-      "js": ["scripts/github/authorize.js", "scripts/github/github.js", "scripts/github/oauth2.js", "popup.js"]
+      "css": ["popup.css"],
+      "js": ["popup.js"]
     }
   ],
   "oauth2": {
