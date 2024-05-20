@@ -1,12 +1,14 @@
 document.addEventListener('DOMContentLoaded', function() {
-  chrome.storage.local.get('githubToken', function(result) {
+  chrome.storage.local.get(['githubToken', 'selectedRepo'], function(result) {
     if (result.githubToken) {
-      // Token exists, show logout button and fetch repos
       document.getElementById('login').style.display = 'none';
       document.getElementById('logout').style.display = 'block';
-      fetchRepos(result.githubToken);
+      if (result.selectedRepo) {
+        showSelectedRepo(result.selectedRepo);
+      } else {
+        fetchRepos(result.githubToken);
+      }
     } else {
-      // No token, show login button
       document.getElementById('login').style.display = 'block';
       document.getElementById('logout').style.display = 'none';
     }
@@ -52,11 +54,12 @@ document.addEventListener('DOMContentLoaded', function() {
   });
 
   document.getElementById('logout').addEventListener('click', function() {
-    chrome.storage.local.remove('githubToken', function() {
+    chrome.storage.local.remove(['githubToken', 'selectedRepo'], function() {
       document.getElementById('login').style.display = 'block';
       document.getElementById('logout').style.display = 'none';
       document.getElementById('repoSection').style.display = 'none';
       document.getElementById('repoList').innerHTML = '';
+      document.getElementById('selectedRepo').innerHTML = '';
     });
   });
 });
@@ -72,8 +75,20 @@ function fetchRepos(token) {
     repos.forEach(repo => {
       const li = document.createElement('li');
       li.textContent = repo.name;
+      li.addEventListener('click', function() {
+        chrome.storage.local.set({ selectedRepo: repo.name }, function() {
+          showSelectedRepo(repo.name);
+        });
+      });
       repoList.appendChild(li);
     });
     document.getElementById('repoSection').style.display = 'block';
   });
+}
+
+function showSelectedRepo(repoName) {
+  document.getElementById('repoList').innerHTML = '';
+  const selectedRepo = document.getElementById('selectedRepo');
+  selectedRepo.innerHTML = `Selected Repository: ${repoName}`;
+  selectedRepo.style.display = 'block';
 }
