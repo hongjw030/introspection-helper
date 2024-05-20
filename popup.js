@@ -166,23 +166,21 @@ function showOwnerName(ownerName) {
   ownerNameSpan.innerHTML = ownerName;
 }
 
-function encodeBase64(input) {
-  const utf8Bytes = new TextEncoder().encode(input);
-  return btoa(String.fromCharCode(...utf8Bytes));
-}
-
 function createFileAndCommit(token, repoName, fileName, content, ownerName) {
-  let latestCommitSha; // latestCommitSha 변수를 함수 내에서 선언
+  function encodeBase64(input) {
+    const utf8Bytes = new TextEncoder().encode(input);
+    return btoa(String.fromCharCode(...utf8Bytes));
+  }
 
-  function createFileAndCommitRecursive(fileName) {
-    return fetch(`https://api.github.com/repos/${ownerName}/${repoName}/contents/${fileName}`, {
+  function handleFileCreation(token, repoName, fileName, content, ownerName) {
+    fetch(`https://api.github.com/repos/${ownerName}/${repoName}/contents/${fileName}`, {
       method: 'PUT',
       headers: {
         Authorization: `token ${token}`,
         'Content-Type': 'application/json'
       },
       body: JSON.stringify({
-        message: 'feat: Create new Introspection file',
+        message: 'Create new Introspection',
         content: encodeBase64(content) // encode content to base64
       })
     })
@@ -190,135 +188,137 @@ function createFileAndCommit(token, repoName, fileName, content, ownerName) {
       if (response.status === 201) {
         return response.json();
       } else if (response.status === 422) {
-        // 중복된 파일이 있을 경우 사용자에게 새 파일 이름을 입력받기
-        const newFileName = prompt("같은 이름의 파일이 존재합니다! 새 파일 이름을 입력해주세요.") + ".md";
-        if (newFileName) {
-          // 사용자가 입력한 새 파일 이름이 있는 경우 재귀 호출
-          return createFileAndCommitRecursive(newFileName);
-        } else {
-          // 사용자가 입력을 취소한 경우
-          throw new Error("취소되었습니다.");
-        }
+        throw new Error("file name duplicated");
       } else {
         throw new Error('Failed to create file');
       }
+    })
+    .then(data => {
+      const commitMessage = 'Add new Introspection file';
+      const branch = 'main'; // Change to your default branch if needed
+      const sha = data.content.sha;
+
+      // Get the latest commit
+      return fetch(`https://api.github.com/repos/${ownerName}/${repoName}/git/refs/heads/${branch}`, {
+        method: 'GET',
+        headers: {
+          Authorization: `token ${token}`
+        }
+      });
+    })
+    .then(response => {
+      if (response.status === 200) {
+        return response.json();
+      } else {
+        throw new Error('Failed to get branch reference');
+      }
+    })
+    .then(refData => {
+      const latestCommitSha = refData.object.sha; // latestCommitSha 변수에 할당
+      return fetch(`https://api.github.com/repos/${ownerName}/${repoName}/git/commits/${latestCommitSha}`, {
+        method: 'GET',
+        headers: {
+          Authorization: `token ${token}`
+        }
+      });
+    })
+    .then(response => {
+      if (response.status === 200) {
+        return response.json();
+      } else {
+        throw new Error('Failed to get latest commit data');
+      }
+    })
+    .then(commitData => {
+      // Create tree
+      const treeSha = commitData.tree.sha;
+
+      return fetch(`https://api.github.com/repos/${ownerName}/${repoName}/git/trees`, {
+        method: 'POST',
+        headers: {
+          Authorization: `token ${token}`,
+          'Content-Type': 'application/json'
+        },
+        body: JSON.stringify({
+          base_tree: treeSha, // latestCommitSha를 참조
+          tree: [{
+            path: fileName,
+            mode: '100644',
+            type: 'blob',
+            content: encodeBase64(content) // encode content to base64
+          }]
+        })
+      });
+    })
+    .then(response => {
+      if (response.status === 201) {
+        return response.json();
+      } else {
+        throw new Error('Failed to create tree');
+      }
+    })
+    .then(treeData => {
+      const treeSha = treeData.sha;
+
+      // Create commit
+      return fetch(`https://api.github.com/repos/${ownerName}/${repoName}/git/commits`, {
+        method: 'POST',
+        headers: {
+          Authorization: `token ${token}`,
+          'Content-Type': 'application/json'
+        },
+        body: JSON.stringify({
+          message: commitMessage,
+          parents: [latestCommitSha],
+          tree: treeSha
+        })
+      });
+    })
+    .then(response => {
+      if (response.status === 201) {
+        return response.json();
+      } else {
+        throw new Error('Failed to create commit');
+      }
+    })
+    .then(commitData => {
+      const commitSha = commitData.sha;
+
+      // Update branch reference
+      return fetch(`https://api.github.com/repos/${ownerName}/${repoName}/git/refs/heads/${branch}`, {
+        method: 'PATCH',
+        headers: {
+          Authorization: `token ${token}`,
+          'Content-Type': 'application/json'
+        },
+        body: JSON.stringify({
+          sha: commitSha,
+          force: false
+        })
+      });
+    })
+    .then(response => {
+      if (response.status === 200) {
+        console.log('Commit created successfully');
+      } else {
+        throw new Error('Failed to update branch reference');
+      }
+    })
+    .catch(error => {
+      if (error.message === "file name duplicated") {
+        const newFileName = prompt("같은 이름의 파일이 존재합니다! 새 파일 이름을 입력하세요:");
+        if (newFileName) {
+          handleFileCreation(token, repoName, newFileName, content, ownerName); // 새 파일 이름으로 다시 시도
+        } else {
+          alert("파일 이름을 입력해야 커밋돼요.");
+        }
+      } else {
+        console.log(error);
+      }
+    }).finally(() => {
+
     });
   }
-
-  return createFileAndCommitRecursive(fileName).then(data => {
-    const commitMessage = 'Add new Markdown file';
-    const branch = 'main'; // Change to your default branch if needed
-    const sha = data.content.sha;
-
-    // Get the latest commit
-    return fetch(`https://api.github.com/repos/${ownerName}/${repoName}/git/refs/heads/${branch}`, {
-      method: 'GET',
-      headers: {
-        Authorization: `token ${token}`
-      }
-    });
-  })
-  .then(response => {
-    if (response.status === 200) {
-      return response.json();
-    } else {
-      throw new Error('Failed to get branch reference');
-    }
-  })
-  .then(refData => {
-    latestCommitSha = refData.object.sha; // latestCommitSha 변수에 할당
-    return fetch(`https://api.github.com/repos/${ownerName}/${repoName}/git/commits/${latestCommitSha}`, {
-      method: 'GET',
-      headers: {
-        Authorization: `token ${token}`
-      }
-    });
-  })
-  .then(response => {
-    if (response.status === 200) {
-      return response.json();
-    } else {
-      throw new Error('Failed to get latest commit data');
-    }
-  })
-  .then(commitData => {
-    // Create tree
-    const treeSha = commitData.tree.sha;
-
-    return fetch(`https://api.github.com/repos/${ownerName}/${repoName}/git/trees`, {
-      method: 'POST',
-      headers: {
-        Authorization: `token ${token}`,
-        'Content-Type': 'application/json'
-      },
-      body: JSON.stringify({
-        base_tree: treeSha, // latestCommitSha를 참조
-        tree: [{
-          path: fileName,
-          mode: '100644',
-          type: 'blob',
-          content: encodeBase64(content) // encode content to base64
-        }]
-      })
-    });
-  })
-  .then(response => {
-    if (response.status === 201) {
-      return response.json();
-    } else {
-      throw new Error('Failed to create tree');
-    }
-  })
-  .then(treeData => {
-    const treeSha = treeData.sha;
-  
-    // Create commit
-    return fetch(`https://api.github.com/repos/${ownerName}/${repoName}/git/commits`, {
-      method: 'POST',
-      headers: {
-        Authorization: `token ${token}`,
-        'Content-Type': 'application/json'
-      },
-      body: JSON.stringify({
-        message: commitMessage,
-        parents: [latestCommitSha],
-        tree: treeSha
-      })
-    });
-  })
-  .then(response => {
-    if (response.status === 201) {
-      return response.json();
-    } else {
-      throw new Error('Failed to create commit');
-    }
-  })
-  .then(commitData => {
-    const commitSha = commitData.sha;
-  
-    // Update branch reference
-    return fetch(`https://api.github.com/repos/${ownerName}/${repoName}/git/refs/heads/${branch}`, {
-      method: 'PATCH',
-      headers: {
-        Authorization: `token ${token}`,
-        'Content-Type': 'application/json'
-      },
-      body: JSON.stringify({
-        sha: commitSha,
-        force: false
-      })
-    });
-  })
-  .then(response => {
-    if (response.status === 200) {
-      console.log('Commit created successfully');
-    } else {
-      throw new Error('Failed to update branch reference');
-    }
-  })
-  .catch(error => {
-    console.log(error)
-  }).finally(()=>{
-    alert("finally console!")
-  })
+  // 처음 파일 생성 시도
+  handleFileCreation(token, repoName, fileName, content, ownerName);
 }
