@@ -105,6 +105,20 @@ document.addEventListener('DOMContentLoaded', function() {
   });
 });
 
+function encodeBase64(input) {
+  const utf8Bytes = new TextEncoder().encode(input);
+  return btoa(String.fromCharCode(...utf8Bytes));
+}
+
+function decodeBase64(base64) {
+  const binaryString = atob(base64);
+  const bytes = new Uint8Array(binaryString.length);
+  for (let i = 0; i < binaryString.length; i++) {
+    bytes[i] = binaryString.charCodeAt(i);
+  }
+  return new TextDecoder().decode(bytes);
+}
+
 function getCurrentDate() {
   const today = new Date();
   const year = today.getFullYear();
@@ -196,7 +210,7 @@ function createFileAndCommit(token, repoName, fileName, content, ownerName) {
     const folderData = {
       path: folderPath,
       message: 'Create new folder',
-      content: btoa(''), // 빈 내용으로 폴더 생성
+      content: encodeBase64(''), // 빈 내용으로 폴더 생성
       branch: 'main' // 변경 필요 시 수정
     };
 
@@ -286,7 +300,7 @@ function createFileAndCommit(token, repoName, fileName, content, ownerName) {
           },
           body: JSON.stringify({
             message: 'Create new Markdown file',
-            content: btoa(content) // encode content to base64
+            content: encodeBase64(content) // encode content to base64
           })
         });
       } else {
