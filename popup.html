@@ -5,7 +5,7 @@
   <meta charset="UTF-8" />
   <meta http-equiv="x-ua-compatible" content="IE=edge" />
   <style>
-    body {
+   body {
       width: 300px;
       font-family: Arial, sans-serif;
     }
@@ -15,6 +15,9 @@
     #selectedRepo {
       margin-top: 10px;
       font-weight: bold;
+    }
+    #postSection {
+      margin-top: 20px;
     }
   </style>
 </head>
@@ -27,6 +30,11 @@
     <ul id="repoList"></ul>
   </div>
   <div id="selectedRepo" style="display:none;"></div>
+  <div id="postSection" style="display:none;">
+    <h2>Create Markdown File</h2>
+    <input type="text" id="postInput" placeholder="Enter text for Markdown file">
+    <button id="submitPost">Submit</button>
+  </div>
   <script src="popup.js"></script>
 </body>
 </html>
