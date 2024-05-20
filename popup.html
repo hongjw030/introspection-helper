@@ -1,41 +1,58 @@
 <!DOCTYPE html>
 <html>
 <head>
-  <title>GitHub Markdown Committer</title>
+  <title>Introspection Helper</title>
   <meta charset="UTF-8" />
   <meta http-equiv="x-ua-compatible" content="IE=edge" />
-  <style>
-   body {
-      width: 300px;
-      font-family: Arial, sans-serif;
-    }
-    #repoList {
-      margin-top: 10px;
-    }
-    #selectedRepo {
-      margin-top: 10px;
-      font-weight: bold;
-    }
-    #postSection {
-      margin-top: 20px;
-    }
-  </style>
+  <link rel="stylesheet" href="popup.css">
 </head>
-<body>
-  <h1>GitHub Repo Viewer</h1>
-  <button id="login" style="display:none;">GitHub Login</button>
-  <button id="logout" style="display:none;">GitHub Logout</button>
-  <div id="repoSection" style="display:none;">
-    <h2>Repositories</h2>
-    <ul id="repoList"></ul>
-  </div>
-  <div id="ownerNameSection" style="display:none;"></div>
-  <div id="selectedRepo" style="display:none;"></div>
-  <div id="postSection" style="display:none;">
-    <h2>Create Markdown File</h2>
-    <input type="text" id="postInput" placeholder="Enter text for Markdown file">
-    <button id="submitPost">Submit</button>
-  </div>
+
+<body id="extension-body">
+  <main class="extension-main">
+  <header class="extension-header">
+    <span class="highlighted">Introspection </span>
+    Helper
+  </header>
+  
+  <button id="login" class="extension-button" style="display:none;">GitHub Login</button>
+  
+  <section id="repoSection" class="extension-section" style="display:none;">
+    <h2 class="extension-section-title">Choose Repositories!</h2>
+    <ul id="repoList" aria-describedby="repository list"></ul>
+  </section>
+
+  <section class="extension-section">
+    <p id="ownerNameP" class="user-p" style="display:none;">
+      <span>Owner Nickname is : </span>
+      <span id="ownerNameSpan" class="highlighted"></span>
+    </p>
+    <p id="selectedRepoP" class="user-p" style="display:none;">
+      <span>Selected Repo is : </span>
+      <span id="selectedRepoSpan" class="highlighted"></span>
+    </p>
+    <button id="logout" class="extension-button" style="display:none;">GitHub Logout</button>
+  </section>
+  
+  <section id="postSection" class="extension-section" style="display:none;">
+    <h2 class="extension-section-title">Write Your Introspection!</h2>
+    <textarea id="postInput" class="extension-textarea" placeholder="type your introspection!"></textarea>
+    <button id="submitPost" class="extension-button">Submit</button>
+  </section>
+
+  <footer class="extension-footer">
+    <div class="extension-information-link">
+      <a  href="chrome-extension://nkmemnehekmfeekceceegmaobidfpghm/welcome.html" target="_blank">homepage</a>
+    </div>
+    <div class="extension-information-link">
+      <a href="mailto:hongjw030@naver.com">mail to</a>
+    </div>
+    <div class="extension-information-link">
+      <a href="https://github.com/hongjw030/introspection-helper" target="_blank">repository</a>
+    </div>
+  </footer>
+</main>
   <script src="popup.js"></script>
+
 </body>
+
 </html>

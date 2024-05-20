@@ -5,10 +5,11 @@ document.addEventListener('DOMContentLoaded', function() {
       document.getElementById('logout').style.display = 'block';
       if (result.selectedRepo) {
         showSelectedRepo(result.selectedRepo);
-        document.getElementById('postSection').style.display = 'block';
+        document.getElementById('selectedRepoP').style.display = 'flex';
+        document.getElementById('postSection').style.display = 'flex';
         if (result.ownerName) {
           showOwnerName(result.ownerName);
-          document.getElementById('ownerNameSection').style.display = 'block';
+          document.getElementById('ownerNameP').style.display = 'flex';
         } else {
           fetchRepos(result.githubToken);
         }
@@ -145,26 +146,24 @@ function fetchRepos(token) {
       li.addEventListener('click', function() {
         chrome.storage.local.set({ selectedRepo: repo.name }, function() {
           showSelectedRepo(repo.name);
-          document.getElementById('postSection').style.display = 'block';
+          document.getElementById('postSection').style.display = 'flex';
         });
       });
       repoList.appendChild(li);
     });
-    document.getElementById('repoSection').style.display = 'block';
+    document.getElementById('repoSection').style.display = 'flex';
   });
 }
 
 function showSelectedRepo(repoName) {
   document.getElementById('repoList').innerHTML = '';
-  const selectedRepo = document.getElementById('selectedRepo');
-  selectedRepo.innerHTML = `Selected Repository: ${repoName}`;
-  selectedRepo.style.display = 'block';
+  const selectedRepoSpan = document.getElementById('selectedRepoSpan');
+  selectedRepoSpan.innerHTML = repoName;
 }
 
 function showOwnerName(ownerName) {
-  const ownerNameSection = document.getElementById('ownerNameSection');
-  ownerNameSection.innerHTML = `ownerName is: ${ownerName}`;
-  ownerNameSection.style.display = 'block';
+  const ownerNameSpan = document.getElementById('ownerNameSpan');
+  ownerNameSpan.innerHTML = ownerName;
 }
 
 function createFileAndCommit(token, repoName, fileName, content, ownerName) {

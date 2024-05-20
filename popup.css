@@ -1,0 +1,104 @@
+*{
+  box-sizing: border-box;
+}
+
+.extension-main {
+  padding: 10px;
+  width: 400px;
+  display: flex;
+  flex-direction: column;
+  justify-content:center;
+  align-items:center;
+  gap: 1rem;
+}
+
+.extension-header{
+  font-size: 2rem;
+  font-weight: 700;
+}
+
+.extension-section{
+  width:100%; 
+  display: flex;
+  flex-direction: column;
+  justify-content:center;
+  align-items:center;
+  gap: 8px;
+}
+#ownerNameSpan, #selectedRepoSpan{
+  font-size: 1rem;
+  font-weight: 500;
+}
+
+.extension-section-title{
+  font-size:1rem;
+  font-weight:500;
+}
+
+.user-p{
+  font-size: 0.8rem;
+  padding: 0;
+  margin: 0;
+}
+
+.extension-footer{
+  border-top: 1px solid #aaaaaa;
+  width:100%;
+  margin: 20px 0px;
+  padding: 20px 20px 10px;
+  font-size: 0.8rem;
+  display:flex;
+  justify-content: space-between;
+}
+
+.extension-information-link{
+
+}
+
+.highlighted{
+  color: #00bbaa
+ }
+
+ /* button, input 스타일 */
+ .extension-textarea {
+  width: 100%;
+  height: 200px;
+  border-radius: 8px;
+  border: 1px solid #aaaaaa
+}
+.extension-button{
+  width: 240px;
+  height: 32px;
+  border: none;
+  border-radius: 8px;
+  color: #ffffff;
+  cursor: pointer;
+}
+#login, #submitPost{
+  background-color: #00bbaa
+}
+#logout{
+  background-color: #fa4D79
+}
+
+/* 
+button{
+  border-radius: 8px;
+  border: none;
+  width: 100%;
+  padding: 5px 10px;
+  color: white;
+  width: 200px;
+  cursor: pointer;
+  font-weight: 700px;
+  font-size: 18px;
+}
+
+button#login, button#submitPost {
+  background-color: #1E90FF;
+}
+
+button#logout {
+  background-color: #9F1D35;
+}
+ */
