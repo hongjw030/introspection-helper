@@ -1,8 +1,8 @@
 ---
 name: Feat request
 about: Suggest an idea for this project
-title: "[FEAT]"
-labels: enhancement
+title: ''
+labels: ''
 assignees: ''
 
 ---
