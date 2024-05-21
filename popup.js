@@ -308,7 +308,8 @@ function createFileAndCommit(token, repoName, fileName, content, ownerName) {
         const newFileName = prompt(`파일 이름 '${fileName}'이 이미 존재합니다. 새 파일 이름을 입력하세요.`);
         if (newFileName) {
           // 사용자가 새 파일 이름을 입력한 경우 파일 생성 함수 재귀 호출
-          return createNewFile(token, repoName, newFileName, content, ownerName, folderPath);
+          let myFileName = newFileName + ".md";
+          return createNewFile(token, repoName, myFileName, content, ownerName, folderPath);
         } else {
           // 사용자가 입력을 취소한 경우
           throw new Error('파일 이름 입력이 취소되었습니다.');
