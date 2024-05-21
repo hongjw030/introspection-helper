@@ -82,6 +82,7 @@ document.addEventListener('DOMContentLoaded', function() {
   document.getElementById('save').addEventListener('click', function(){
     const textarea = document.getElementById('postInput');
     chrome.storage.local.set({savedText: textarea.value});
+    alert("임시 저장되었습니다! submit 버튼으로 제출하면 자동으로 저장된 내용은 사라집니다.");
   })
 
   document.getElementById('submitPost').addEventListener('click', function() {
