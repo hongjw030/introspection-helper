@@ -1,5 +1,5 @@
 document.addEventListener('DOMContentLoaded', function() {
-  chrome.storage.local.get(['githubToken', 'selectedRepo', 'ownerName'], function(result) {
+  chrome.storage.local.get(['githubToken', 'selectedRepo', 'ownerName', 'savedText'], function(result) {
     if (result.githubToken) {
       document.getElementById('login').style.display = 'none';
       document.getElementById('logout').style.display = 'block';
@@ -11,6 +11,10 @@ document.addEventListener('DOMContentLoaded', function() {
           showSelectedRepo(result.selectedRepo, result.ownerName);
           document.getElementById('postSection').style.display = 'flex';
           document.getElementById('selectedRepoP').style.display = 'flex';
+          if (result.savedText){
+            const textarea = document.getElementById('postInput');
+            textarea.value = result.savedText;
+          }
         } else {
           fetchRepos(result.githubToken);
         }
@@ -64,7 +68,7 @@ document.addEventListener('DOMContentLoaded', function() {
   });
 
   document.getElementById('logout').addEventListener('click', function() {
-    chrome.storage.local.remove(['githubToken', 'selectedRepo', 'ownerName'], function() {
+    chrome.storage.local.remove(['githubToken', 'selectedRepo', 'ownerName', 'savedText'], function() {
       document.getElementById('login').style.display = 'block';
       document.getElementById('logout').style.display = 'none';
       document.getElementById('ownerSection').style.display = 'none';
@@ -74,6 +78,11 @@ document.addEventListener('DOMContentLoaded', function() {
     let token = chrome.storage.local.get('githubToken');
     console.log(token)
   });
+
+  document.getElementById('save').addEventListener('click', function(){
+    const textarea = document.getElementById('postInput');
+    chrome.storage.local.set({savedText: textarea.value});
+  })
 
   document.getElementById('submitPost').addEventListener('click', function() {
     chrome.storage.local.get('githubToken', function(result) {
@@ -102,6 +111,7 @@ document.addEventListener('DOMContentLoaded', function() {
         })
       });
     });
+    chrome.storage.local.remove(['savedText'], function() {})
   });
 });
 
