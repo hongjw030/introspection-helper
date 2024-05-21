@@ -1,1 +1,355 @@
-(()=>{function e(e){const t=(new TextEncoder).encode(e);return btoa(String.fromCharCode(...t))}function t(e){fetch("https://api.github.com/user/repos",{headers:{Authorization:`token ${e}`}}).then((e=>e.json())).then((e=>{const t=document.getElementById("repoList");let n="";chrome.storage.local.get(["ownerName"],(function(e){e.ownerName&&(n=e.ownerName)})),t.innerHTML="",e.length>0?e.forEach((e=>{const c=document.createElement("li");c.setAttribute("class","extension-li"),c.textContent=e.name,c.addEventListener("click",(function(){chrome.storage.local.set({selectedRepo:e.name},(function(){o(e.name,n),document.getElementById("postSection").style.display="flex"}))})),t.appendChild(c)})):t.innerHTML="Your repository not exist!! Please make your own.",document.getElementById("repoSection").style.display="flex"}))}function o(e,t){document.getElementById("repoSection").style.display="none",document.getElementById("ownerSection").style.display="flex",document.getElementById("selectedRepoSpan").innerHTML=`<a href="https://www.github.com/${t}/${e}" target="_blank" class="highlighted">${e}</a>`}document.addEventListener("DOMContentLoaded",(function(){chrome.storage.local.get(["githubToken","selectedRepo","ownerName","savedText"],(function(e){var n;e.githubToken?(document.getElementById("login").style.display="none",document.getElementById("logout").style.display="block",document.getElementById("ownerSection").style.display="flex",e.ownerName?(n=e.ownerName,document.getElementById("ownerNameSpan").innerHTML=`<a href="https://www.github.com/${n}" target="_blank" class="highlighted">${n}</a>`,document.getElementById("ownerNameP").style.display="flex",e.selectedRepo?(o(e.selectedRepo,e.ownerName),document.getElementById("postSection").style.display="flex",document.getElementById("selectedRepoP").style.display="flex",e.savedText&&(document.getElementById("postInput").value=e.savedText)):t(e.githubToken)):t(e.githubToken)):(document.getElementById("login").style.display="block",document.getElementById("logout").style.display="none")})),document.getElementById("login").addEventListener("click",(function(){const e=chrome.identity.getRedirectURL(),o=`https://github.com/login/oauth/authorize?client_id=Ov23liS8uJ1LJSioNTPc&redirect_uri=${encodeURIComponent(e)}&scope=repo`;chrome.identity.launchWebAuthFlow({url:o,interactive:!0},(function(o){if(chrome.runtime.lastError)return void console.error(chrome.runtime.lastError.message);const n=new URLSearchParams(new URL(o).search).get("code");fetch("https://github.com/login/oauth/access_token",{method:"POST",headers:{Accept:"application/json","Content-Type":"application/json"},body:JSON.stringify({client_id:"Ov23liS8uJ1LJSioNTPc",client_secret:"904fcc78be315af16780349f2f74d701aeb3fd34",code:n,redirect_uri:e})}).then((e=>e.json())).then((e=>{const o=e.access_token;chrome.storage.local.set({githubToken:o},(function(){document.getElementById("login").style.display="none",document.getElementById("logout").style.display="block",t(o)})),function(e){console.log(e),fetch("https://api.github.com/user",{headers:{Authorization:`token ${e}`}}).then((e=>e.json())).then((e=>{const t=e.login;chrome.storage.local.set({ownerName:t},(function(){console.log("Owner name stored:",t)}))}))}(o)}))}))})),document.getElementById("logout").addEventListener("click",(function(){chrome.storage.local.remove(["githubToken","selectedRepo","ownerName","savedText"],(function(){document.getElementById("login").style.display="block",document.getElementById("logout").style.display="none",document.getElementById("ownerSection").style.display="none",document.getElementById("repoSection").style.display="none",document.getElementById("postSection").style.display="none"}));let e=chrome.storage.local.get("githubToken");console.log(e)})),document.getElementById("save").addEventListener("click",(function(){const e=document.getElementById("postInput");chrome.storage.local.set({savedText:e.value}),alert("임시 저장되었습니다! submit 버튼으로 제출하면 자동으로 저장된 내용은 사라집니다.")})),document.getElementById("submitPost").addEventListener("click",(function(){chrome.storage.local.get("githubToken",(function(t){const o=t.githubToken;o?chrome.storage.local.get("selectedRepo",(function(t){const n=t.selectedRepo;if(!n)return void console.error("Selected repository not found");const c=document.getElementById("postInput").value,r=`${function(){const e=new Date;return`${e.getFullYear()}${(e.getMonth()+1).toString().padStart(2,"0")}${e.getDate().toString().padStart(2,"0")}`}()}.md`;chrome.storage.local.get("ownerName",(function(t){const s=t.ownerName;s?function(t,o,n,c,r){function s(t,o,n,c,r,i){fetch(`https://api.github.com/repos/${r}/${o}/contents/${i}/${n}`,{method:"GET",headers:{Authorization:`token ${t}`}}).then((a=>{if(404===a.status)return fetch(`https://api.github.com/repos/${r}/${o}/contents/${i}/${n}`,{method:"PUT",headers:{Authorization:`token ${t}`,"Content-Type":"application/json"},body:JSON.stringify({message:"Create new Markdown file",content:e(c)})});{const e=prompt(`파일 이름 '${n}'이 이미 존재합니다. 새 파일 이름을 입력하세요.`);if(e)return s(t,o,e+".md",c,r,i);throw new Error("파일 이름 입력이 취소되었습니다.")}})).then((e=>{if(201!==e.status)throw new Error("Failed to create file");alert(`파일 ${n}이(가) 생성되었습니다.`),document.getElementById("postInput").value=""})).catch((e=>{"Failed to create file"===e.message&&alert("Error: 커밋에 실패했습니다."),console.error("Error:",e)}))}const i=new Date;!function(t,o,n,c,r,i){fetch(`https://api.github.com/repos/${r}/${o}/contents/${i}`,{method:"GET",headers:{Authorization:`token ${t}`}}).then((a=>404===a.status?function(t,o,n,c,r,i){const a=i.split("/").pop(),l=i.split("/").slice(0,-1).join("/");e(""),fetch(`https://api.github.com/repos/${r}/${o}/contents/${l}`,{method:"GET",headers:{Authorization:`token ${t}`}}).then((e=>e.json())).then((e=>{const n=e.sha;return fetch(`https://api.github.com/repos/${r}/${o}/git/trees`,{method:"POST",headers:{Authorization:`token ${t}`,"Content-Type":"application/json"},body:JSON.stringify({base_tree:n,tree:[{path:a,mode:"040000",type:"tree",content:""}]})})})).then((e=>e.json())).then((e=>{const n=e.sha;return fetch(`https://api.github.com/repos/${r}/${o}/git/commits`,{method:"POST",headers:{Authorization:`token ${t}`,"Content-Type":"application/json"},body:JSON.stringify({message:"Create new folder",tree:n,parents:[]})})})).then((e=>e.json())).then((e=>{const n=e.sha;return fetch(`https://api.github.com/repos/${r}/${o}/git/refs/heads/main`,{method:"PATCH",headers:{Authorization:`token ${t}`,"Content-Type":"application/json"},body:JSON.stringify({sha:n})})})).then((()=>s(t,o,n,c,r,i))).catch((e=>{console.error("Error:",e)}))}(t,o,n,c,r,i):s(t,o,n,c,r,i))).catch((e=>{console.error("Error:",e)}))}(t,o,n,c,r,`${i.getFullYear()}/${String(i.getMonth()+1).padStart(2,"0")}`)}(o,n,r,c,s):console.error("No owner name found")}))})):console.error("GitHub token not found")})),chrome.storage.local.remove(["savedText"],(function(){}))}))}))})();
+/******/ (() => { // webpackBootstrap
+var __webpack_exports__ = {};
+/*!**************************!*\
+  !*** ./scripts/popup.js ***!
+  \**************************/
+function _toConsumableArray(arr) { return _arrayWithoutHoles(arr) || _iterableToArray(arr) || _unsupportedIterableToArray(arr) || _nonIterableSpread(); }
+function _nonIterableSpread() { throw new TypeError("Invalid attempt to spread non-iterable instance.\nIn order to be iterable, non-array objects must have a [Symbol.iterator]() method."); }
+function _unsupportedIterableToArray(o, minLen) { if (!o) return; if (typeof o === "string") return _arrayLikeToArray(o, minLen); var n = Object.prototype.toString.call(o).slice(8, -1); if (n === "Object" && o.constructor) n = o.constructor.name; if (n === "Map" || n === "Set") return Array.from(o); if (n === "Arguments" || /^(?:Ui|I)nt(?:8|16|32)(?:Clamped)?Array$/.test(n)) return _arrayLikeToArray(o, minLen); }
+function _iterableToArray(iter) { if (typeof Symbol !== "undefined" && iter[Symbol.iterator] != null || iter["@@iterator"] != null) return Array.from(iter); }
+function _arrayWithoutHoles(arr) { if (Array.isArray(arr)) return _arrayLikeToArray(arr); }
+function _arrayLikeToArray(arr, len) { if (len == null || len > arr.length) len = arr.length; for (var i = 0, arr2 = new Array(len); i < len; i++) arr2[i] = arr[i]; return arr2; }
+document.addEventListener('DOMContentLoaded', function () {
+  chrome.storage.local.get(['githubToken', 'selectedRepo', 'ownerName', 'savedText'], function (result) {
+    if (result.githubToken) {
+      document.getElementById('login').style.display = 'none';
+      document.getElementById('logout').style.display = 'block';
+      document.getElementById('ownerSection').style.display = 'flex';
+      if (result.ownerName) {
+        showOwnerName(result.ownerName);
+        document.getElementById('ownerNameP').style.display = 'flex';
+        if (result.selectedRepo) {
+          showSelectedRepo(result.selectedRepo, result.ownerName);
+          document.getElementById('postSection').style.display = 'flex';
+          document.getElementById('selectedRepoP').style.display = 'flex';
+          if (result.savedText) {
+            var textarea = document.getElementById('postInput');
+            textarea.value = result.savedText;
+          }
+        } else {
+          fetchRepos(result.githubToken);
+        }
+      } else {
+        fetchRepos(result.githubToken);
+      }
+    } else {
+      document.getElementById('login').style.display = 'block';
+      document.getElementById('logout').style.display = 'none';
+    }
+  });
+  document.getElementById('login').addEventListener('click', function () {
+    var redirectUri = chrome.identity.getRedirectURL();
+    var authUrl = "https://github.com/login/oauth/authorize?client_id=Ov23liS8uJ1LJSioNTPc&redirect_uri=".concat(encodeURIComponent(redirectUri), "&scope=repo");
+    chrome.identity.launchWebAuthFlow({
+      url: authUrl,
+      interactive: true
+    }, function (redirectUrl) {
+      if (chrome.runtime.lastError) {
+        console.error(chrome.runtime.lastError.message);
+        return;
+      }
+      var params = new URLSearchParams(new URL(redirectUrl).search);
+      var code = params.get('code');
+      fetch('https://github.com/login/oauth/access_token', {
+        method: 'POST',
+        headers: {
+          'Accept': 'application/json',
+          'Content-Type': 'application/json'
+        },
+        body: JSON.stringify({
+          client_id: 'Ov23liS8uJ1LJSioNTPc',
+          client_secret: '904fcc78be315af16780349f2f74d701aeb3fd34',
+          code: code,
+          redirect_uri: redirectUri
+        })
+      }).then(function (response) {
+        return response.json();
+      }).then(function (data) {
+        var token = data.access_token;
+        chrome.storage.local.set({
+          githubToken: token
+        }, function () {
+          document.getElementById('login').style.display = 'none';
+          document.getElementById('logout').style.display = 'block';
+          fetchRepos(token);
+        });
+        fetchOwnerName(token);
+      });
+    });
+  });
+  document.getElementById('logout').addEventListener('click', function () {
+    chrome.storage.local.remove(['githubToken', 'selectedRepo', 'ownerName', 'savedText'], function () {
+      document.getElementById('login').style.display = 'block';
+      document.getElementById('logout').style.display = 'none';
+      document.getElementById('ownerSection').style.display = 'none';
+      document.getElementById('repoSection').style.display = 'none';
+      document.getElementById('postSection').style.display = 'none';
+    });
+    var token = chrome.storage.local.get('githubToken');
+    console.log(token);
+  });
+  document.getElementById('save').addEventListener('click', function () {
+    var textarea = document.getElementById('postInput');
+    chrome.storage.local.set({
+      savedText: textarea.value
+    });
+    alert("임시 저장되었습니다! submit 버튼으로 제출하면 자동으로 저장된 내용은 사라집니다.");
+  });
+  document.getElementById('submitPost').addEventListener('click', function () {
+    chrome.storage.local.get('githubToken', function (result) {
+      var token = result.githubToken;
+      if (!token) {
+        console.error('GitHub token not found');
+        return;
+      }
+      chrome.storage.local.get('selectedRepo', function (repoResult) {
+        var repoName = repoResult.selectedRepo;
+        if (!repoName) {
+          console.error('Selected repository not found');
+          return;
+        }
+        var content = document.getElementById('postInput').value;
+        var fileName = "".concat(getCurrentDate(), ".md");
+        chrome.storage.local.get('ownerName', function (ownerResult) {
+          var ownerName = ownerResult.ownerName;
+          if (!ownerName) {
+            console.error('No owner name found');
+            return;
+          }
+          createFileAndCommit(token, repoName, fileName, content, ownerName);
+        });
+      });
+    });
+    chrome.storage.local.remove(['savedText'], function () {});
+  });
+});
+function encodeBase64(input) {
+  var utf8Bytes = new TextEncoder().encode(input);
+  return btoa(String.fromCharCode.apply(String, _toConsumableArray(utf8Bytes)));
+}
+function decodeBase64(base64) {
+  var binaryString = atob(base64);
+  var bytes = new Uint8Array(binaryString.length);
+  for (var i = 0; i < binaryString.length; i++) {
+    bytes[i] = binaryString.charCodeAt(i);
+  }
+  return new TextDecoder().decode(bytes);
+}
+function getCurrentDate() {
+  var today = new Date();
+  var year = today.getFullYear();
+  var month = (today.getMonth() + 1).toString().padStart(2, '0'); // 월은 0부터 시작하므로 +1 필요
+  var day = today.getDate().toString().padStart(2, '0');
+  return "".concat(year).concat(month).concat(day);
+}
+function fetchOwnerName(token) {
+  console.log(token);
+  fetch('https://api.github.com/user', {
+    headers: {
+      Authorization: "token ".concat(token)
+    }
+  }).then(function (response) {
+    return response.json();
+  }).then(function (userData) {
+    var ownerName = userData.login;
+    chrome.storage.local.set({
+      ownerName: ownerName
+    }, function () {
+      console.log('Owner name stored:', ownerName);
+    });
+  });
+}
+function fetchRepos(token) {
+  fetch('https://api.github.com/user/repos', {
+    headers: {
+      Authorization: "token ".concat(token)
+    }
+  }).then(function (response) {
+    return response.json();
+  }).then(function (repos) {
+    var repoList = document.getElementById('repoList');
+    var ownerName = '';
+    chrome.storage.local.get(['ownerName'], function (result) {
+      if (result.ownerName) ownerName = result.ownerName;
+    });
+    repoList.innerHTML = '';
+    if (repos.length > 0) {
+      repos.forEach(function (repo) {
+        var li = document.createElement('li');
+        li.setAttribute('class', "extension-li");
+        li.textContent = repo.name;
+        li.addEventListener('click', function () {
+          chrome.storage.local.set({
+            selectedRepo: repo.name
+          }, function () {
+            showSelectedRepo(repo.name, ownerName);
+            document.getElementById('postSection').style.display = 'flex';
+          });
+        });
+        repoList.appendChild(li);
+      });
+    } else {
+      repoList.innerHTML = "Your repository not exist!! Please make your own.";
+    }
+    document.getElementById('repoSection').style.display = 'flex';
+  });
+}
+function showSelectedRepo(repoName, ownerName) {
+  document.getElementById('repoSection').style.display = 'none';
+  document.getElementById('ownerSection').style.display = 'flex';
+  var selectedRepoSpan = document.getElementById('selectedRepoSpan');
+  selectedRepoSpan.innerHTML = "<a href=\"https://www.github.com/".concat(ownerName, "/").concat(repoName, "\" target=\"_blank\" class=\"highlighted\">").concat(repoName, "</a>");
+}
+function showOwnerName(ownerName) {
+  var ownerNameSpan = document.getElementById('ownerNameSpan');
+  ownerNameSpan.innerHTML = "<a href=\"https://www.github.com/".concat(ownerName, "\" target=\"_blank\" class=\"highlighted\">").concat(ownerName, "</a>");
+}
+function createFileAndCommit(token, repoName, fileName, content, ownerName) {
+  var latestCommitSha; // latestCommitSha 변수를 함수 내에서 선언
+
+  function createFileInFolder(token, repoName, fileName, content, ownerName, folderPath) {
+    fetch("https://api.github.com/repos/".concat(ownerName, "/").concat(repoName, "/contents/").concat(folderPath), {
+      method: 'GET',
+      headers: {
+        Authorization: "token ".concat(token)
+      }
+    }).then(function (response) {
+      if (response.status === 404) {
+        // 폴더가 없으므로 생성
+        return createFolderAndFile(token, repoName, fileName, content, ownerName, folderPath);
+      } else {
+        // 폴더가 이미 존재하므로 파일 생성
+        return createNewFile(token, repoName, fileName, content, ownerName, folderPath);
+      }
+    })["catch"](function (error) {
+      console.error('Error:', error);
+    });
+  }
+  function createFolderAndFile(token, repoName, fileName, content, ownerName, folderPath) {
+    var folderName = folderPath.split('/').pop();
+    var parentFolder = folderPath.split('/').slice(0, -1).join('/');
+    var folderData = {
+      path: folderPath,
+      message: 'Create new folder',
+      content: encodeBase64(''),
+      // 빈 내용으로 폴더 생성
+      branch: 'main' // 변경 필요 시 수정
+    };
+    fetch("https://api.github.com/repos/".concat(ownerName, "/").concat(repoName, "/contents/").concat(parentFolder), {
+      method: 'GET',
+      headers: {
+        Authorization: "token ".concat(token)
+      }
+    }).then(function (response) {
+      return response.json();
+    }).then(function (data) {
+      var baseTreeSha = data.sha;
+      return fetch("https://api.github.com/repos/".concat(ownerName, "/").concat(repoName, "/git/trees"), {
+        method: 'POST',
+        headers: {
+          Authorization: "token ".concat(token),
+          'Content-Type': 'application/json'
+        },
+        body: JSON.stringify({
+          base_tree: baseTreeSha,
+          tree: [{
+            path: folderName,
+            mode: '040000',
+            // 디렉터리 모드
+            type: 'tree',
+            content: '' // 빈 내용
+          }]
+        })
+      });
+    }).then(function (response) {
+      return response.json();
+    }).then(function (data) {
+      var newTreeSha = data.sha;
+      return fetch("https://api.github.com/repos/".concat(ownerName, "/").concat(repoName, "/git/commits"), {
+        method: 'POST',
+        headers: {
+          Authorization: "token ".concat(token),
+          'Content-Type': 'application/json'
+        },
+        body: JSON.stringify({
+          message: 'Create new folder',
+          tree: newTreeSha,
+          parents: []
+        })
+      });
+    }).then(function (response) {
+      return response.json();
+    }).then(function (data) {
+      var newCommitSha = data.sha;
+      return fetch("https://api.github.com/repos/".concat(ownerName, "/").concat(repoName, "/git/refs/heads/main"), {
+        method: 'PATCH',
+        headers: {
+          Authorization: "token ".concat(token),
+          'Content-Type': 'application/json'
+        },
+        body: JSON.stringify({
+          sha: newCommitSha
+        })
+      });
+    }).then(function () {
+      // 폴더 생성 후 파일 생성
+      return createNewFile(token, repoName, fileName, content, ownerName, folderPath);
+    })["catch"](function (error) {
+      console.error('Error:', error);
+    });
+  }
+  function createNewFile(token, repoName, fileName, content, ownerName, folderPath) {
+    fetch("https://api.github.com/repos/".concat(ownerName, "/").concat(repoName, "/contents/").concat(folderPath, "/").concat(fileName), {
+      method: 'GET',
+      headers: {
+        Authorization: "token ".concat(token)
+      }
+    }).then(function (response) {
+      if (response.status === 404) {
+        // 파일이 존재하지 않으므로 생성
+        return fetch("https://api.github.com/repos/".concat(ownerName, "/").concat(repoName, "/contents/").concat(folderPath, "/").concat(fileName), {
+          method: 'PUT',
+          headers: {
+            Authorization: "token ".concat(token),
+            'Content-Type': 'application/json'
+          },
+          body: JSON.stringify({
+            message: 'Create new Markdown file',
+            content: encodeBase64(content) // encode content to base64
+          })
+        });
+      } else {
+        // 파일이 이미 존재하므로 새 파일 이름을 입력받음
+        var newFileName = prompt("\uD30C\uC77C \uC774\uB984 '".concat(fileName, "'\uC774 \uC774\uBBF8 \uC874\uC7AC\uD569\uB2C8\uB2E4. \uC0C8 \uD30C\uC77C \uC774\uB984\uC744 \uC785\uB825\uD558\uC138\uC694."));
+        if (newFileName) {
+          // 사용자가 새 파일 이름을 입력한 경우 파일 생성 함수 재귀 호출
+          var myFileName = newFileName + ".md";
+          return createNewFile(token, repoName, myFileName, content, ownerName, folderPath);
+        } else {
+          // 사용자가 입력을 취소한 경우
+          throw new Error('파일 이름 입력이 취소되었습니다.');
+        }
+      }
+    }).then(function (response) {
+      if (response.status === 201) {
+        alert("\uD30C\uC77C ".concat(fileName, "\uC774(\uAC00) \uC0DD\uC131\uB418\uC5C8\uC2B5\uB2C8\uB2E4."));
+        document.getElementById('postInput').value = '';
+      } else {
+        throw new Error('Failed to create file');
+      }
+    })["catch"](function (error) {
+      if (error.message === 'Failed to create file') {
+        alert("Error: 커밋에 실패했습니다.");
+      }
+      console.error('Error:', error);
+    });
+  }
+  var currentDate = new Date();
+  var year = currentDate.getFullYear();
+  var month = String(currentDate.getMonth() + 1).padStart(2, '0');
+  var folderPath = "".concat(year, "/").concat(month);
+  createFileInFolder(token, repoName, fileName, content, ownerName, folderPath);
+}
+/******/ })()
+;
+//# sourceMappingURL=bundle.js.map
