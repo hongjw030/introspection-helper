@@ -32,8 +32,8 @@
   "content_scripts": [
     {
       "matches": ["<all_urls>"],
-      "css": ["popup.css"],
-      "js": ["popup.js"]
+      "css": ["styles/popup.css"],
+      "js": ["dist/bundle.js"]
     }
   ],
   "oauth2": {
