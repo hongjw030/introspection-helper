@@ -5,6 +5,7 @@
 .extension-main {
   padding: 10px;
   width: 400px;
+  height: 600px;
   display: flex;
   flex-direction: column;
   justify-content:center;
@@ -33,6 +34,8 @@
 .extension-section-title{
   font-size:1rem;
   font-weight:500;
+  margin: 0;
+  padding: 0;
 }
 
 .extension-ul{
@@ -88,12 +91,11 @@
   width: 100%;
 }
 .extension-goto{
-  color: black;
+  color: white;
   text-decoration: none;
-}
-.extension-goto:hover{
-  color:blue;
-  text-decoration: underline;
+  background-color: #999999;
+  padding: 8px;
+  border-radius: 8px
 }
 #login, #submitPost{
   background-color: #00bbaa

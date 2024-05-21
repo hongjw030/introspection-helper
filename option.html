@@ -8,6 +8,44 @@
   <!-- <script type="module" src="./dist/bundle.js"></script> -->
 </head>
 <body id="page-body">
-  
+  <main class="extension-main">
+    <header class="extension-header">
+      <p class="extension-title">
+        <span class="highlighted">Introspection </span>
+        Helper
+      </p>
+      <div>
+        <a id="popupLink" class="extension-goto" href="popup.html"><- go back to textarea</a>
+      </div>
+    </header>
+    
+    <section id="option-section-clock" class="extension-section">
+      1. 오늘 며칠인지 볼수 있는 기능 checkbox 
+      <br/>
+      2. 오늘 회고 썼는지 볼수 있는기능 checkbox
+      <br/>
+      3. 시간 알림 설정 기능 checkbox + 시계 설정 기능
+      <br/>
+    </section>
+
+    <section id="option-section-name" class="extension-section">
+      1. 폴더 이름 바꾸는 기능 input / save 버튼 / 현재 폴더 이름 text / reset 버튼
+      <br/>
+      2. 파일 이름 바꾸는 기능 input / save 버튼 / 현재 파일 이름 text / reset 버튼
+      <br/>
+      3. 커밋 메세지 바꾸는 기능 input / save 버튼 / 현재 커밋메세지 이름 text / reset 버튼
+      <br/>
+    </section>
+    
+    <section id="option-section-template" class="extension-section">
+      1. 현재 적용된 템플릿: text / reset 버튼
+      <br/>
+      2. 템플릿 새로 만들기: textarea / save 버튼
+      <br/>
+      3. 템플릿 저장해두기(제목, 내용을 적고 submit 버튼을 누르면 해당 레포 templates 폴더 안에 해당 이름의 템플릿이 생성됨.): 제목input / textarea / submit 버튼
+      <br/>
+    </section>
+
+  </main>
 </body>
 </html>
