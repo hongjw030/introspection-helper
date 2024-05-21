@@ -85,11 +85,6 @@
   color: #ffffff;
   cursor: pointer;
 }
-.buttons{
-  display: flex;
-  gap: 1rem;
-  width: 100%;
-}
 .extension-goto{
   color: white;
   text-decoration: none;
@@ -99,9 +94,6 @@
 }
 #login, #submitPost{
   background-color: #00bbaa
-}
-#save{
-  background-color: #ffaa33;
 }
 #logout{
   background-color: #fa4D79
