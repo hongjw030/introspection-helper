@@ -4,13 +4,13 @@ document.addEventListener('DOMContentLoaded', function() {
       document.getElementById('login').style.display = 'none';
       document.getElementById('logout').style.display = 'block';
       document.getElementById('ownerSection').style.display = 'flex';
-      if (result.selectedRepo) {
-        showSelectedRepo(result.selectedRepo);
-        document.getElementById('selectedRepoP').style.display = 'flex';
-        document.getElementById('postSection').style.display = 'flex';
-        if (result.ownerName) {
-          showOwnerName(result.ownerName);
-          document.getElementById('ownerNameP').style.display = 'flex';
+      if (result.ownerName) {
+        showOwnerName(result.ownerName);
+        document.getElementById('ownerNameP').style.display = 'flex';
+        if (result.selectedRepo) {
+          showSelectedRepo(result.selectedRepo, result.ownerName);
+          document.getElementById('postSection').style.display = 'flex';
+          document.getElementById('selectedRepoP').style.display = 'flex';
         } else {
           fetchRepos(result.githubToken);
         }
@@ -151,13 +151,17 @@ function fetchRepos(token) {
     }
   }).then(response => response.json()).then(repos => {
     const repoList = document.getElementById('repoList');
+    let ownerName = ''
+    chrome.storage.local.get(['ownerName'], function(result){
+      if (result.ownerName) ownerName = result.ownerName;
+    })
     repoList.innerHTML = '';
     repos.forEach(repo => {
       const li = document.createElement('li');
       li.textContent = repo.name;
       li.addEventListener('click', function() {
         chrome.storage.local.set({ selectedRepo: repo.name }, function() {
-          showSelectedRepo(repo.name);
+          showSelectedRepo(repo.name, ownerName);
           document.getElementById('postSection').style.display = 'flex';
         });
       });
@@ -167,16 +171,16 @@ function fetchRepos(token) {
   });
 }
 
-function showSelectedRepo(repoName) {
+function showSelectedRepo(repoName, ownerName) {
   document.getElementById('repoSection').style.display='none';
   document.getElementById('ownerSection').style.display='flex';
   const selectedRepoSpan = document.getElementById('selectedRepoSpan');
-  selectedRepoSpan.innerHTML = repoName;
+  selectedRepoSpan.innerHTML = `<a href="https://www.github.com/${ownerName}/${repoName}" target="_blank" class="highlighted">${repoName}</a>`;
 }
 
 function showOwnerName(ownerName) {
   const ownerNameSpan = document.getElementById('ownerNameSpan');
-  ownerNameSpan.innerHTML = ownerName;
+  ownerNameSpan.innerHTML = `<a href="https://www.github.com/${ownerName}" target="_blank" class="highlighted">${ownerName}</a>`;
 }
 
 
