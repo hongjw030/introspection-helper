@@ -35,6 +35,18 @@
   font-weight:500;
 }
 
+.extension-ul{
+  width:100%;
+  list-style: none;
+  font-size: 1rem;
+}
+.extension-li{
+  padding: 4px;
+}
+.extension-li:hover{
+  color:blue;
+}
+
 .user-p{
   font-size: 0.8rem;
   padding: 0;

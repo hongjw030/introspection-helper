@@ -156,17 +156,22 @@ function fetchRepos(token) {
       if (result.ownerName) ownerName = result.ownerName;
     })
     repoList.innerHTML = '';
-    repos.forEach(repo => {
-      const li = document.createElement('li');
-      li.textContent = repo.name;
-      li.addEventListener('click', function() {
-        chrome.storage.local.set({ selectedRepo: repo.name }, function() {
-          showSelectedRepo(repo.name, ownerName);
-          document.getElementById('postSection').style.display = 'flex';
+    if (repos.length > 0){
+      repos.forEach(repo => {
+        const li = document.createElement('li');
+        li.setAttribute('class', "extension-li")
+        li.textContent = repo.name;
+        li.addEventListener('click', function() {
+          chrome.storage.local.set({ selectedRepo: repo.name }, function() {
+            showSelectedRepo(repo.name, ownerName);
+            document.getElementById('postSection').style.display = 'flex';
+          });
         });
+        repoList.appendChild(li);
       });
-      repoList.appendChild(li);
-    });
+    }else{
+      repoList.innerHTML = "Your repository not exist!! Please make your own."
+    }
     document.getElementById('repoSection').style.display = 'flex';
   });
 }
