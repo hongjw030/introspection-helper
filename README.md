@@ -17,12 +17,15 @@
    3. [커밋 메세지 커스텀하는 법](#3-커밋-메세지를-커스텀하고-싶어요)
    4. [회고 템플릿 커스텀 하는 법](#4-회고-템플릿을-만들어서-쓰고-싶어요)
 5. [문의](#문의)
+6. [컨벤션](#컨벤션)
 
 ## Introspection Helper란?
 
 매일매일 회고를 쓰려 해도 자꾸만 까먹는 분들을 위해 (제 얘기입니다) 만든 크롬 익스텐션입니다. 익스텐션 입력창에 간단한 마크다운 형식의 회고를 작성하고 제출하면, 연결된 레파지토리에 자동으로 커밋됩니다.
 
-라이센스 / 저작권
+<a href="LICENSE"><img src="https://img.shields.io/badge/license-MIT-blue.svg" alt="license"/></a>
+이 프로젝트는 MIT 라이선스에 따라 라이선스가 부여됩니다. 자세한 내용은 [LICENSE](./LICENSE) 파일을 참조하세요.
+
 
 <br/>
 <br/>
@@ -68,3 +71,25 @@
 
 문제가 생겼다면 Issues -> Bug report 템플릿을 활용해주세요.
 제안하고 싶은 게 있다면 Issues -> feat request 템플릿을 활용해주세요.
+
+<br/>
+<br/>
+
+---
+
+## 컨벤션
+
+#### 커밋 메세지 컨벤션
+- **feat**: 새로운 기능 추가
+- **fix**: 버그 수정
+- **docs**: 문서 수정
+- **style**: 코드 포맷팅 (코드 변경 없음)
+- **refactor**: 코드 리팩토링 (기능 변경 없음)
+- **test**: 테스트 추가 또는 수정
+- **chore**: 빌드 프로세스 또는 보조 도구 변경
+
+## 네이밍 컨벤션
+- 변수 및 함수 이름: camelCase (예: myFunction)
+- id 이름: kebab-case (예: main-header)
+- class 이름: BEM (예: nav__item nav__item--active)
+- 상수: UPPER_SNAKE_CASE (예: MAX_VALUE)
