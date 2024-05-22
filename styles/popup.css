@@ -2,10 +2,9 @@
   box-sizing: border-box;
 }
 
-.extension-main {
+.main {
   padding: 10px;
   width: 400px;
-  height: 600px;
   display: flex;
   flex-direction: column;
   justify-content:center;
@@ -13,10 +12,12 @@
   gap: 1rem;
 }
 
-.extension-header{
+.header{
   font-size: 2rem;
   font-weight: 700;
 }
+
+/*  */
 
 .extension-section{
   width:100%; 
