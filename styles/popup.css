@@ -24,6 +24,9 @@
   border-radius: 8px;
   color: #ffffff;
   cursor: pointer;
+  text-align:center;
+  justify-content: center;
+  align-items:center;
 }
 .text--highlighted{
   color: #00bbaa
