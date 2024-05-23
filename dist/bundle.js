@@ -518,7 +518,7 @@ function _asyncToGenerator(fn) { return function () { var self = this, args = ar
 
 
 document.addEventListener('DOMContentLoaded', function () {
-  chrome.storage.local.get(['githubToken', 'selectedRepo', 'nickname', 'savedText'], /*#__PURE__*/function () {
+  chrome.storage.local.get(['githubToken', 'selectedRepo', 'nickname', 'savedText', 'savedTemplate'], /*#__PURE__*/function () {
     var _ref = _asyncToGenerator( /*#__PURE__*/_regeneratorRuntime().mark(function _callee(result) {
       var textarea;
       return _regeneratorRuntime().wrap(function _callee$(_context) {
@@ -531,10 +531,13 @@ document.addEventListener('DOMContentLoaded', function () {
                 (0,_visibilities_setReadyToPostScreen__WEBPACK_IMPORTED_MODULE_8__.setReadyToPostScreen)(result.nickname, result.selectedRepo);
                 (0,_visibilities_setNicknameScreen__WEBPACK_IMPORTED_MODULE_7__.setNicknameScreen)(result.nickname);
                 (0,_visibilities_setSelectedRepoScreen__WEBPACK_IMPORTED_MODULE_10__.setSelectedRepoScreen)(result.selectedRepo, result.nickname);
-                // 저장했던 글이 있다면 불러오기.
+                textarea = document.getElementById('extension-post-textarea');
                 if (result.savedText) {
-                  textarea = document.getElementById('extension-post-textarea');
+                  // 저장했던 글이 있다면 불러오기.
                   textarea.value = result.savedText;
+                } else if (result.savedTemplate) {
+                  // 저장한 글이 없다면 , 템플릿이 있다면 그거 불러오기
+                  textarea.value = result.savedTemplate;
                 }
               } else {
                 // 레포 선택안한 채로 창을 끄면 재로그인해야 함.

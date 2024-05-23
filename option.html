@@ -5,6 +5,7 @@
   <meta charset="UTF-8" />
   <meta http-equiv="x-ua-compatible" content="IE=edge" />
   <link rel="stylesheet" href="./styles/option.css">
+  <script type="module" src="./scripts//option.js"></script>
   <!-- <script type="module" src="./dist/bundle.js"></script> -->
 </head>
 <body id="extension-option-body">
@@ -35,13 +36,14 @@
     </section>
     
     <section id="extension-option-template-section" class="section section--template">
-      1. 현재 적용된 템플릿: text / reset 버튼
-      <br/>
-      2. 템플릿 새로 만들기: textarea / save 버튼
-      <br/>
-      3. 템플릿 저장해두기(제목, 내용을 적고 submit 버튼을 누르면 해당 레포 templates 폴더 안에 해당 이름의 템플릿이 생성됨.): 제목input / textarea / submit 버튼
-      <br/>
+      <h2 class="section__title">Introspection Template</h2>
+      <textarea id="extension-option-template-textarea" class="textarea section__textarea section__textarea--template" placeholder="Custom your template!"></textarea>
+      <div class="div--buttonList">
+        <button id="extension-option-template-save-button" class="button button--save button--primary">save</button>
+        <button id="extension-option-template-reset-button" class="button button--reset button--warning">reset</button>
+      </div>
     </section>
+
 
   </main>
 </body>
