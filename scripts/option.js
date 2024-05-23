@@ -5,6 +5,15 @@ document.addEventListener('DOMContentLoaded', function() {
     } 
   });
 
+  // 오늘 회고 작성했는지 여부 확인 기능
+  document.getElementById('extension-option-habit-checkbox').addEventListener('change', ({target})=>{
+    if (target.checked){
+      chrome.storage.local.set({"habit": true});
+    }else{
+      chrome.storage.local.set({"habit": false});
+    }
+  })
+
   // 템플릿 저장 버튼 기능
   document.getElementById('extension-option-template-save-button').addEventListener('click', function(){
     const textarea = document.getElementById('extension-option-template-textarea');
