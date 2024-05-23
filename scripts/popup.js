@@ -1,3 +1,5 @@
+import { encodeBase64 } from "./utils/setTextEncode";
+
 document.addEventListener('DOMContentLoaded', function() {
   chrome.storage.local.get(['githubToken', 'selectedRepo', 'ownerName', 'savedText'], function(result) {
     if (result.githubToken) {
@@ -115,20 +117,6 @@ document.addEventListener('DOMContentLoaded', function() {
     chrome.storage.local.remove(['savedText'], function() {})
   });
 });
-
-function encodeBase64(input) {
-  const utf8Bytes = new TextEncoder().encode(input);
-  return btoa(String.fromCharCode(...utf8Bytes));
-}
-
-function decodeBase64(base64) {
-  const binaryString = atob(base64);
-  const bytes = new Uint8Array(binaryString.length);
-  for (let i = 0; i < binaryString.length; i++) {
-    bytes[i] = binaryString.charCodeAt(i);
-  }
-  return new TextDecoder().decode(bytes);
-}
 
 function getCurrentDate() {
   const today = new Date();
