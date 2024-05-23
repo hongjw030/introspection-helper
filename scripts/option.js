@@ -1,5 +1,8 @@
 document.addEventListener('DOMContentLoaded', function() {
-  chrome.storage.local.get(['savedTemplate'], async function(result) {
+  chrome.storage.local.get(['habit', 'savedTemplate'], async function(result) {
+    if (result.habit){
+      document.getElementById('extension-option-habit-checkbox').setAttribute('checked', true);
+    }
     if (result.savedTemplate) {
       document.getElementById('extension-option-template-textarea').value = result.savedTemplate;
     } 

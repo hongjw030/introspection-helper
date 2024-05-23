@@ -90,7 +90,7 @@ document.addEventListener('DOMContentLoaded', function() {
 
   // 로그아웃 버튼 기능
   document.getElementById('extension-logout-button').addEventListener('click', function() {
-    chrome.storage.local.remove(['githubToken', 'selectedRepo', 'nickname', 'savedText', 'savedTemplate'], ()=> {
+    chrome.storage.local.remove(['githubToken', 'selectedRepo', 'nickname', 'savedText', 'savedTemplate', 'habit', 'submissionDate'], ()=> {
       setLogoutScreen();
     });
   });
