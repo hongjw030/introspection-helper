@@ -6,40 +6,37 @@ import { encodeBase64 } from "./utils/setTextEncode";
 import { setChooseRepoScreen } from "./visibilities/setChooseRepoScreen";
 import { setLogoutScreen } from "./visibilities/setLogoutScreen";
 import { setNicknameScreen } from "./visibilities/setNicknameScreen";
+import { setReadyToPostScreen } from "./visibilities/setReadyToPostScreen";
 import { setRepoListScreen } from "./visibilities/setRepoListScreen";
 import { setSelectedRepoScreen } from "./visibilities/setSelectedRepoScreen";
 
 document.addEventListener('DOMContentLoaded', function() {
   chrome.storage.local.get(['githubToken', 'selectedRepo', 'nickname', 'savedText'], async function(result) {
+    // 깃헙 토큰이 있다면 로그인된 상태.
     if (result.githubToken) {
-      document.getElementById('extension-login-button').style.display = 'none';
-      document.getElementById('extension-logout-button').style.display = 'flex';
-      document.getElementById('extension-user-section').style.display = 'flex';
-      if (result.nickname) {
+      // 이미 레포를 선택했었다면
+      if (result.selectedRepo) {
+        setReadyToPostScreen(result.nickname, result.selectedRepo);
         setNicknameScreen(result.nickname);
-        document.getElementById('extension-user-nickname-p').style.display = 'flex';
-        if (result.selectedRepo) {
-          document.getElementById('extension-post-section').style.display = 'flex';
-          document.getElementById('extension-user-selectedRepo-p').style.display = 'flex';
-          setSelectedRepoScreen(result.selectedRepo, result.nickname);
-          if (result.savedText){
-            const textarea = document.getElementById('extension-post-textarea');
-            textarea.value = result.savedText;
-          }
-        } else {
-          const repoList = await getRepoList(result.token);
-          setRepoListScreen(repoList, result.nickname);
+        setSelectedRepoScreen(result.selectedRepo, result.nickname);
+        // 저장했던 글이 있다면 불러오기.
+        if (result.savedText){
+          const textarea = document.getElementById('extension-post-textarea');
+          textarea.value = result.savedText;
         }
       } else {
-        const repoList = await getRepoList(result.token);
-        setRepoListScreen(repoList, result.nickname);
+        // 레포 선택안한 채로 창을 끄면 재로그인해야 함.
+        chrome.storage.local.remove(['githubToken', 'selectedRepo', 'nickname', 'savedText'], ()=> {
+          setLogoutScreen();
+        });
       }
     } else {
-      document.getElementById('extension-login-button').style.display = 'block';
-      document.getElementById('extension-logout-button').style.display = 'none';
+      // github 토큰이 없다면 로그인이 안된 상태이므로 LogoutScreen 상태 보여짐.
+      setLogoutScreen();
     }
   });
 
+  // 로그인 버튼 기능
   document.getElementById('extension-login-button').addEventListener('click', function() {
     const redirectUri = chrome.identity.getRedirectURL();
     const authUrl = `https://github.com/login/oauth/authorize?client_id=Ov23liS8uJ1LJSioNTPc&redirect_uri=${encodeURIComponent(redirectUri)}&scope=repo`;
@@ -62,8 +59,7 @@ document.addEventListener('DOMContentLoaded', function() {
       })
       // 토큰 받으면 바로 유저 닉네임 받아오기
       const nickname = await getNickname(token);
-      chrome.storage.local.set({nickname: nickname}, (result)=>{
-        console.log(result.nickname)
+      chrome.storage.local.set({nickname: nickname}, ()=>{
       });
       // 유저 닉네임 받으면 바로 레포 리스트 받아오기
       const repoList = await getRepoList(token);
@@ -71,18 +67,21 @@ document.addEventListener('DOMContentLoaded', function() {
     });
   });
 
+  // 로그아웃 버튼 기능
   document.getElementById('extension-logout-button').addEventListener('click', function() {
     chrome.storage.local.remove(['githubToken', 'selectedRepo', 'nickname', 'savedText'], ()=> {
       setLogoutScreen();
     });
   });
 
+// 임시저장 버튼 기능
   document.getElementById('extension-save-button').addEventListener('click', function(){
     const textarea = document.getElementById('extension-post-textarea');
     chrome.storage.local.set({savedText: textarea.value});
     alert("임시 저장되었습니다! submit 버튼으로 제출하면 자동으로 저장된 내용은 사라집니다.");
   })
 
+  // 제출 버튼 기능
   document.getElementById('extension-submit-button').addEventListener('click', function() {
     chrome.storage.local.get('githubToken', function(result) {
       const token = result.githubToken;

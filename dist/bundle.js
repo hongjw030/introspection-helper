@@ -288,11 +288,13 @@ __webpack_require__.r(__webpack_exports__);
 /* harmony export */ __webpack_require__.d(__webpack_exports__, {
 /* harmony export */   setChooseRepoScreen: () => (/* binding */ setChooseRepoScreen)
 /* harmony export */ });
-// 로그인 버튼을 누르면 다음 페이지로 choose repo 페이지로 이동함.
+// 로그인했지만 아직 repo를 선택하지 않은 상태.
 function setChooseRepoScreen() {
   document.getElementById('extension-login-button').style.display = 'none';
   document.getElementById('extension-logout-button').style.display = 'flex';
   document.getElementById('extension-repoList-section').style.display = 'flex';
+  document.getElementById('extension-user-section').style.display = 'none';
+  document.getElementById('extension-post-section').style.display = 'none';
 }
 
 /***/ }),
@@ -329,6 +331,7 @@ __webpack_require__.r(__webpack_exports__);
 /* harmony export */   setNicknameScreen: () => (/* binding */ setNicknameScreen)
 /* harmony export */ });
 function setNicknameScreen(nickname) {
+  document.getElementById('extension-user-nickname-p').style.display = 'flex';
   var nicknameSpan = document.getElementById('extension-user-nickname-span');
   nicknameSpan.innerHTML = "<a href=\"https://www.github.com/".concat(nickname, "\" target=\"_blank\" class=\"text--highlighted\">").concat(nickname, "</a>");
 }
@@ -346,10 +349,16 @@ __webpack_require__.r(__webpack_exports__);
 /* harmony export */   setReadyToPostScreen: () => (/* binding */ setReadyToPostScreen)
 /* harmony export */ });
 // setChooseRepoScreen에서 레포를 선택한 후 글쓰기 창으로 넘어간 화면
+// 로그인했고 repo도 선택한 상태.
+
 function setReadyToPostScreen(nickname, repoName) {
+  document.getElementById('extension-login-button').style.display = 'none';
+  document.getElementById('extension-logout-button').style.display = 'flex';
   document.getElementById('extension-post-section').style.display = 'flex';
   document.getElementById('extension-repoList-section').style.display = 'none';
   document.getElementById('extension-user-section').style.display = 'flex';
+  document.getElementById('extension-user-nickname-p').style.display = 'flex';
+  document.getElementById('extension-user-selectedRepo-p').style.display = 'flex';
   var selectedRepoSpan = document.getElementById('extension-user-selectedRepo-span');
   selectedRepoSpan.innerHTML = "<a href=\"https://www.github.com/".concat(nickname, "/").concat(repoName, "\" target=\"_blank\" class=\"text--highlighted\">").concat(repoName, "</a>");
 }
@@ -484,8 +493,9 @@ __webpack_require__.r(__webpack_exports__);
 /* harmony import */ var _visibilities_setChooseRepoScreen__WEBPACK_IMPORTED_MODULE_5__ = __webpack_require__(/*! ./visibilities/setChooseRepoScreen */ "./scripts/visibilities/setChooseRepoScreen.js");
 /* harmony import */ var _visibilities_setLogoutScreen__WEBPACK_IMPORTED_MODULE_6__ = __webpack_require__(/*! ./visibilities/setLogoutScreen */ "./scripts/visibilities/setLogoutScreen.js");
 /* harmony import */ var _visibilities_setNicknameScreen__WEBPACK_IMPORTED_MODULE_7__ = __webpack_require__(/*! ./visibilities/setNicknameScreen */ "./scripts/visibilities/setNicknameScreen.js");
-/* harmony import */ var _visibilities_setRepoListScreen__WEBPACK_IMPORTED_MODULE_8__ = __webpack_require__(/*! ./visibilities/setRepoListScreen */ "./scripts/visibilities/setRepoListScreen.js");
-/* harmony import */ var _visibilities_setSelectedRepoScreen__WEBPACK_IMPORTED_MODULE_9__ = __webpack_require__(/*! ./visibilities/setSelectedRepoScreen */ "./scripts/visibilities/setSelectedRepoScreen.js");
+/* harmony import */ var _visibilities_setReadyToPostScreen__WEBPACK_IMPORTED_MODULE_8__ = __webpack_require__(/*! ./visibilities/setReadyToPostScreen */ "./scripts/visibilities/setReadyToPostScreen.js");
+/* harmony import */ var _visibilities_setRepoListScreen__WEBPACK_IMPORTED_MODULE_9__ = __webpack_require__(/*! ./visibilities/setRepoListScreen */ "./scripts/visibilities/setRepoListScreen.js");
+/* harmony import */ var _visibilities_setSelectedRepoScreen__WEBPACK_IMPORTED_MODULE_10__ = __webpack_require__(/*! ./visibilities/setSelectedRepoScreen */ "./scripts/visibilities/setSelectedRepoScreen.js");
 function _typeof(o) { "@babel/helpers - typeof"; return _typeof = "function" == typeof Symbol && "symbol" == typeof Symbol.iterator ? function (o) { return typeof o; } : function (o) { return o && "function" == typeof Symbol && o.constructor === Symbol && o !== Symbol.prototype ? "symbol" : typeof o; }, _typeof(o); }
 function _slicedToArray(arr, i) { return _arrayWithHoles(arr) || _iterableToArrayLimit(arr, i) || _unsupportedIterableToArray(arr, i) || _nonIterableRest(); }
 function _nonIterableRest() { throw new TypeError("Invalid attempt to destructure non-iterable instance.\nIn order to be iterable, non-array objects must have a [Symbol.iterator]() method."); }
@@ -506,61 +516,37 @@ function _asyncToGenerator(fn) { return function () { var self = this, args = ar
 
 
 
+
 document.addEventListener('DOMContentLoaded', function () {
   chrome.storage.local.get(['githubToken', 'selectedRepo', 'nickname', 'savedText'], /*#__PURE__*/function () {
     var _ref = _asyncToGenerator( /*#__PURE__*/_regeneratorRuntime().mark(function _callee(result) {
-      var textarea, repoList, _repoList;
+      var textarea;
       return _regeneratorRuntime().wrap(function _callee$(_context) {
         while (1) switch (_context.prev = _context.next) {
           case 0:
-            if (!result.githubToken) {
-              _context.next = 26;
-              break;
+            // 깃헙 토큰이 있다면 로그인된 상태.
+            if (result.githubToken) {
+              // 이미 레포를 선택했었다면
+              if (result.selectedRepo) {
+                (0,_visibilities_setReadyToPostScreen__WEBPACK_IMPORTED_MODULE_8__.setReadyToPostScreen)(result.nickname, result.selectedRepo);
+                (0,_visibilities_setNicknameScreen__WEBPACK_IMPORTED_MODULE_7__.setNicknameScreen)(result.nickname);
+                (0,_visibilities_setSelectedRepoScreen__WEBPACK_IMPORTED_MODULE_10__.setSelectedRepoScreen)(result.selectedRepo, result.nickname);
+                // 저장했던 글이 있다면 불러오기.
+                if (result.savedText) {
+                  textarea = document.getElementById('extension-post-textarea');
+                  textarea.value = result.savedText;
+                }
+              } else {
+                // 레포 선택안한 채로 창을 끄면 재로그인해야 함.
+                chrome.storage.local.remove(['githubToken', 'selectedRepo', 'nickname', 'savedText'], function () {
+                  (0,_visibilities_setLogoutScreen__WEBPACK_IMPORTED_MODULE_6__.setLogoutScreen)();
+                });
+              }
+            } else {
+              // github 토큰이 없다면 로그인이 안된 상태이므로 LogoutScreen 상태 보여짐.
+              (0,_visibilities_setLogoutScreen__WEBPACK_IMPORTED_MODULE_6__.setLogoutScreen)();
             }
-            document.getElementById('extension-login-button').style.display = 'none';
-            document.getElementById('extension-logout-button').style.display = 'flex';
-            document.getElementById('extension-user-section').style.display = 'flex';
-            if (!result.nickname) {
-              _context.next = 20;
-              break;
-            }
-            (0,_visibilities_setNicknameScreen__WEBPACK_IMPORTED_MODULE_7__.setNicknameScreen)(result.nickname);
-            document.getElementById('extension-user-nickname-p').style.display = 'flex';
-            if (!result.selectedRepo) {
-              _context.next = 14;
-              break;
-            }
-            document.getElementById('extension-post-section').style.display = 'flex';
-            document.getElementById('extension-user-selectedRepo-p').style.display = 'flex';
-            (0,_visibilities_setSelectedRepoScreen__WEBPACK_IMPORTED_MODULE_9__.setSelectedRepoScreen)(result.selectedRepo, result.nickname);
-            if (result.savedText) {
-              textarea = document.getElementById('extension-post-textarea');
-              textarea.value = result.savedText;
-            }
-            _context.next = 18;
-            break;
-          case 14:
-            _context.next = 16;
-            return (0,_fetchers_getRepoList__WEBPACK_IMPORTED_MODULE_1__.getRepoList)(result.token);
-          case 16:
-            repoList = _context.sent;
-            (0,_visibilities_setRepoListScreen__WEBPACK_IMPORTED_MODULE_8__.setRepoListScreen)(repoList, result.nickname);
-          case 18:
-            _context.next = 24;
-            break;
-          case 20:
-            _context.next = 22;
-            return (0,_fetchers_getRepoList__WEBPACK_IMPORTED_MODULE_1__.getRepoList)(result.token);
-          case 22:
-            _repoList = _context.sent;
-            (0,_visibilities_setRepoListScreen__WEBPACK_IMPORTED_MODULE_8__.setRepoListScreen)(_repoList, result.nickname);
-          case 24:
-            _context.next = 28;
-            break;
-          case 26:
-            document.getElementById('extension-login-button').style.display = 'block';
-            document.getElementById('extension-logout-button').style.display = 'none';
-          case 28:
+          case 1:
           case "end":
             return _context.stop();
         }
@@ -570,6 +556,8 @@ document.addEventListener('DOMContentLoaded', function () {
       return _ref.apply(this, arguments);
     };
   }());
+
+  // 로그인 버튼 기능
   document.getElementById('extension-login-button').addEventListener('click', function () {
     var redirectUri = chrome.identity.getRedirectURL();
     var authUrl = "https://github.com/login/oauth/authorize?client_id=Ov23liS8uJ1LJSioNTPc&redirect_uri=".concat(encodeURIComponent(redirectUri), "&scope=repo");
@@ -607,15 +595,13 @@ document.addEventListener('DOMContentLoaded', function () {
               nickname = _context2.sent;
               chrome.storage.local.set({
                 nickname: nickname
-              }, function (result) {
-                console.log(result.nickname);
-              });
+              }, function () {});
               // 유저 닉네임 받으면 바로 레포 리스트 받아오기
               _context2.next = 15;
               return (0,_fetchers_getRepoList__WEBPACK_IMPORTED_MODULE_1__.getRepoList)(token);
             case 15:
               repoList = _context2.sent;
-              (0,_visibilities_setRepoListScreen__WEBPACK_IMPORTED_MODULE_8__.setRepoListScreen)(repoList, nickname);
+              (0,_visibilities_setRepoListScreen__WEBPACK_IMPORTED_MODULE_9__.setRepoListScreen)(repoList, nickname);
             case 17:
             case "end":
               return _context2.stop();
@@ -627,11 +613,15 @@ document.addEventListener('DOMContentLoaded', function () {
       };
     }());
   });
+
+  // 로그아웃 버튼 기능
   document.getElementById('extension-logout-button').addEventListener('click', function () {
     chrome.storage.local.remove(['githubToken', 'selectedRepo', 'nickname', 'savedText'], function () {
       (0,_visibilities_setLogoutScreen__WEBPACK_IMPORTED_MODULE_6__.setLogoutScreen)();
     });
   });
+
+  // 임시저장 버튼 기능
   document.getElementById('extension-save-button').addEventListener('click', function () {
     var textarea = document.getElementById('extension-post-textarea');
     chrome.storage.local.set({
@@ -639,6 +629,8 @@ document.addEventListener('DOMContentLoaded', function () {
     });
     alert("임시 저장되었습니다! submit 버튼으로 제출하면 자동으로 저장된 내용은 사라집니다.");
   });
+
+  // 제출 버튼 기능
   document.getElementById('extension-submit-button').addEventListener('click', function () {
     chrome.storage.local.get('githubToken', function (result) {
       var token = result.githubToken;
