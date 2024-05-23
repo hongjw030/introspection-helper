@@ -11,7 +11,7 @@ import { setRepoListScreen } from "./visibilities/setRepoListScreen";
 import { setSelectedRepoScreen } from "./visibilities/setSelectedRepoScreen";
 
 document.addEventListener('DOMContentLoaded', function() {
-  chrome.storage.local.get(['githubToken', 'selectedRepo', 'nickname', 'savedText', 'savedTemplate'], async function(result) {
+  chrome.storage.local.get(['githubToken', 'selectedRepo', 'nickname', 'savedText', 'savedTemplate', 'habit', 'submissionDate'], async function(result) {
     // 깃헙 토큰이 있다면 로그인된 상태.
     if (result.githubToken) {
       // 이미 레포를 선택했었다면
@@ -19,6 +19,7 @@ document.addEventListener('DOMContentLoaded', function() {
         setReadyToPostScreen(result.nickname, result.selectedRepo);
         setNicknameScreen(result.nickname);
         setSelectedRepoScreen(result.selectedRepo, result.nickname);
+
         const textarea = document.getElementById('extension-post-textarea');
         if (result.savedText){
           // 저장했던 글이 있다면 불러오기.
@@ -26,6 +27,23 @@ document.addEventListener('DOMContentLoaded', function() {
         }else if (result.savedTemplate){
           // 저장한 글이 없다면 , 템플릿이 있다면 그거 불러오기
           textarea.value = result.savedTemplate;
+        }
+
+        const habitSection = document.getElementById('extension-optional-habit-article');
+        if(result.habit){
+          // 오늘 회고 작성했는지 여부 볼 수 있음.
+          habitSection.style.display='flex';
+          const prevDate = result.submissionDate;
+          const [year, month, day] = getDateInformation();
+          if (prevDate !== `${year}${month}${day}`){
+            // 오늘 제출 안했다면?
+            habitSection.textContent = `${year}년 ${month}월 ${day}일 회고를 작성하지 않았어요! 😐`;
+          }else{
+            // 오늘 제출했다면?
+            habitSection.textContent = `${year}년 ${month}월 ${day}일 회고를 작성했어요! 💯`;
+          }
+        }else{
+          habitSection.style.display='none';
         }
       } else {
         // 레포 선택안한 채로 창을 끄면 재로그인해야 함.
@@ -72,7 +90,7 @@ document.addEventListener('DOMContentLoaded', function() {
 
   // 로그아웃 버튼 기능
   document.getElementById('extension-logout-button').addEventListener('click', function() {
-    chrome.storage.local.remove(['githubToken', 'selectedRepo', 'nickname', 'savedText', 'savedTemplate'], ()=> {
+    chrome.storage.local.remove(['githubToken', 'selectedRepo', 'nickname', 'savedText', 'savedTemplate', 'habit', 'submissionDate'], ()=> {
       setLogoutScreen();
     });
   });
@@ -254,6 +272,11 @@ function createFileAndCommit(token, repoName, fileName, content, nickname) {
     })
     .then(response => {
       if (response.status === 201) {
+        const submissionDate = getInitialFileName();
+        chrome.storage.local.set({'submissionDate': submissionDate})
+        const habitSection = document.getElementById('extension-optional-habit-article');
+        habitSection.textContent = `${year}년 ${month}월 ${day}일 회고를 작성했어요! 💯`;
+
         alert(`파일 ${fileName}이(가) 생성되었습니다.`);
         document.getElementById('extension-post-textarea').value = '';
       } else {

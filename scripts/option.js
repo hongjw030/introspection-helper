@@ -1,9 +1,21 @@
 document.addEventListener('DOMContentLoaded', function() {
-  chrome.storage.local.get(['savedTemplate'], async function(result) {
+  chrome.storage.local.get(['habit', 'savedTemplate'], async function(result) {
+    if (result.habit){
+      document.getElementById('extension-option-habit-checkbox').setAttribute('checked', true);
+    }
     if (result.savedTemplate) {
       document.getElementById('extension-option-template-textarea').value = result.savedTemplate;
     } 
   });
+
+  // 오늘 회고 작성했는지 여부 확인 기능
+  document.getElementById('extension-option-habit-checkbox').addEventListener('change', ({target})=>{
+    if (target.checked){
+      chrome.storage.local.set({"habit": true});
+    }else{
+      chrome.storage.local.set({"habit": false});
+    }
+  })
 
   // 템플릿 저장 버튼 기능
   document.getElementById('extension-option-template-save-button').addEventListener('click', function(){
