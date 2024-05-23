@@ -1,3 +1,4 @@
+import { getDateInformation, getInitialFileName } from "./utils/getDate";
 import { encodeBase64 } from "./utils/setTextEncode";
 
 document.addEventListener('DOMContentLoaded', function() {
@@ -103,7 +104,7 @@ document.addEventListener('DOMContentLoaded', function() {
         }
         const content = document.getElementById('extension-post-textarea').value;
 
-        const fileName = `${getCurrentDate()}.md`;
+        const fileName = `${getInitialFileName()}.md`;
         chrome.storage.local.get('ownerName', function(ownerResult){
           const ownerName = ownerResult.ownerName;
           if (!ownerName){
@@ -117,15 +118,6 @@ document.addEventListener('DOMContentLoaded', function() {
     chrome.storage.local.remove(['savedText'], function() {})
   });
 });
-
-function getCurrentDate() {
-  const today = new Date();
-  const year = today.getFullYear();
-  let month = (today.getMonth() + 1).toString().padStart(2, '0'); // 월은 0부터 시작하므로 +1 필요
-  let day = today.getDate().toString().padStart(2, '0');
-
-  return `${year}${month}${day}`;
-}
 
 function fetchOwnerName(token) {
   console.log(token);
@@ -339,10 +331,7 @@ function createFileAndCommit(token, repoName, fileName, content, ownerName) {
       console.error('Error:', error);
     });
   }
-
-  const currentDate = new Date();
-  const year = currentDate.getFullYear();
-  const month = String(currentDate.getMonth() + 1).padStart(2, '0');
+  const [year, month, day] = getDateInformation();
   const folderPath = `${year}/${month}`;
 
   createFileInFolder(token, repoName, fileName, content, ownerName, folderPath);
