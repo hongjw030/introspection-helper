@@ -11,7 +11,7 @@ import { setRepoListScreen } from "./visibilities/setRepoListScreen";
 import { setSelectedRepoScreen } from "./visibilities/setSelectedRepoScreen";
 
 document.addEventListener('DOMContentLoaded', function() {
-  chrome.storage.local.get(['githubToken', 'selectedRepo', 'nickname', 'savedText'], async function(result) {
+  chrome.storage.local.get(['githubToken', 'selectedRepo', 'nickname', 'savedText', 'savedTemplate'], async function(result) {
     // 깃헙 토큰이 있다면 로그인된 상태.
     if (result.githubToken) {
       // 이미 레포를 선택했었다면
@@ -19,10 +19,13 @@ document.addEventListener('DOMContentLoaded', function() {
         setReadyToPostScreen(result.nickname, result.selectedRepo);
         setNicknameScreen(result.nickname);
         setSelectedRepoScreen(result.selectedRepo, result.nickname);
-        // 저장했던 글이 있다면 불러오기.
+        const textarea = document.getElementById('extension-post-textarea');
         if (result.savedText){
-          const textarea = document.getElementById('extension-post-textarea');
+          // 저장했던 글이 있다면 불러오기.
           textarea.value = result.savedText;
+        }else if (result.savedTemplate){
+          // 저장한 글이 없다면 , 템플릿이 있다면 그거 불러오기
+          textarea.value = result.savedTemplate;
         }
       } else {
         // 레포 선택안한 채로 창을 끄면 재로그인해야 함.
@@ -69,7 +72,7 @@ document.addEventListener('DOMContentLoaded', function() {
 
   // 로그아웃 버튼 기능
   document.getElementById('extension-logout-button').addEventListener('click', function() {
-    chrome.storage.local.remove(['githubToken', 'selectedRepo', 'nickname', 'savedText'], ()=> {
+    chrome.storage.local.remove(['githubToken', 'selectedRepo', 'nickname', 'savedText', 'savedTemplate'], ()=> {
       setLogoutScreen();
     });
   });
