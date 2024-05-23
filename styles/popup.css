@@ -2,7 +2,7 @@
   box-sizing: border-box;
 }
 
-.main {
+#extension-main {
   padding: 10px;
   width: 400px;
   display: flex;
@@ -17,29 +17,51 @@
   font-weight: 700;
 }
 
-/*  */
-
-.extension-section{
-  width:100%; 
-  display: flex;
-  flex-direction: column;
-  justify-content:center;
-  align-items:center;
-  gap: 8px;
+.button{
+  width: 100%;
+  height: 32px;
+  border: none;
+  border-radius: 8px;
+  color: #ffffff;
+  cursor: pointer;
 }
-#ownerNameSpan, #selectedRepoSpan{
-  font-size: 1rem;
-  font-weight: 500;
-}
+.text--highlighted{
+  color: #00bbaa
+ }
+ .button--primary{
+  background-color: #00bbaa;
+ }
+ .button--secondary{
+  background-color: #ffaa33;
+ }
+ .button--warning{
+  background-color: #fa4D79
+ }
 
-.extension-section-title{
+ .section__title{
   font-size:1rem;
   font-weight:500;
   margin: 0;
   padding: 0;
 }
-
-.extension-ul{
+ .section{
+   width:100%; 
+   display: flex;
+   flex-direction: column;
+   justify-content:center;
+   align-items:center;
+   gap: 8px;
+ }
+ .section__p{
+  font-size: 0.8rem;
+  padding: 0;
+  margin: 0;
+}
+.p__span .text--highlighted{
+  font-size: 1rem;
+  font-weight: 500;
+}
+.ul{
   width:100%;
   list-style: none;
   font-size: 1rem;
@@ -51,13 +73,11 @@
   color:blue;
 }
 
-.user-p{
-  font-size: 0.8rem;
-  padding: 0;
-  margin: 0;
-}
+/*  */
 
-.extension-footer{
+
+
+.footer{
   border-top: 1px solid #aaaaaa;
   width:100%;
   margin: 20px 0px;
@@ -67,43 +87,26 @@
   justify-content: space-between;
 }
 
-.highlighted{
-  color: #00bbaa
- }
+
 
  /* button, input 스타일 */
- .extension-textarea {
+ .section__textarea {
   width: 100%;
   height: 200px;
   border-radius: 8px;
   border: 1px solid #aaaaaa
 }
-.extension-button{
-  width: 100%;
-  height: 32px;
-  border: none;
-  border-radius: 8px;
-  color: #ffffff;
-  cursor: pointer;
-}
-.buttons{
+
+.div--buttonList{
   display: flex;
   gap: 1rem;
   width: 100%;
 }
-.extension-goto{
+
+.a{
   color: white;
   text-decoration: none;
   background-color: #999999;
   padding: 8px;
   border-radius: 8px
-}
-#login, #submitPost{
-  background-color: #00bbaa
-}
-#save{
-  background-color: #ffaa33;
-}
-#logout{
-  background-color: #fa4D79
 }

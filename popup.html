@@ -12,51 +12,51 @@
 <body id="extension-body">
   <main id="extension-main" class="main">
     <header id="extension-header" class="header">
-      <span class="header__span highlighted">Introspection </span>
+      <span class="header__span text--highlighted">Introspection </span>
       <span class="header__span">Helper </span>
     </header>
     
-    <button id="login" class="extension-button" style="display:none;">GitHub Login</button>
+    <button id="extension-login-button" class="button button--login button--primary" style="display:none;">GitHub Login</button>
+    <button id="extension-logout-button" class="button button--logout button--warning" style="display:none;">GitHub Logout</button>
     
-    <section id="repoSection" class="extension-section" style="display:none;">
-      <h2 class="extension-section-title">Choose repository!</h2>
-      <ul id="repoList" aria-describedby="repository list" class="extension-ul"></ul>
+    <section id="extension-repoList-section" class="section section--repoList" style="display:none;">
+      <h2 class="section__title">Choose repository!</h2>
+      <ul id="extension-repoList-ul" aria-describedby="repository list" class="ul section__ul--repoList"></ul>
     </section>
   
-    <section id="ownerSection" class="extension-section" style="display:none;">
-      <p id="ownerNameP" class="user-p">
-        <span>Owner Nickname is : </span>
-        <span id="ownerNameSpan" class="highlighted"></span>
+    <section id="extension-user-section" class="section section--user" style="display:none;">
+      <p id="extension-user-nickname-p" class="p section__p section__p--user--nickname">
+        <span class="p__span">Owner Nickname is : </span>
+        <span id="extension-user-nickname-span" class="p__span text--highlighted"></span>
       </p>
-      <p id="selectedRepoP" class="user-p">
-        <span>Selected Repo is : </span>
-        <span id="selectedRepoSpan" class="highlighted"></span>
+      <p id="extension-user-selectedRepo-p" class="p section__p section__p--user--selectedRepo">
+        <span class="p__span">Selected Repo is : </span>
+        <span id="extension-user-selectedRepo-span" class="p__span text--highlighted"></span>
       </p>
-      <button id="logout" class="extension-button" style="display:none;">GitHub Logout</button>
     </section>
     
-    <section id="postSection" class="extension-section" style="display:none;">
-      <h2 class="extension-section-title">Write Your Introspection!</h2>
-      <a id="optionLink" class="extension-goto" href="option.html">go to option -></a>
-      <textarea id="postInput" class="extension-textarea" placeholder="type your introspection!"></textarea>
+    <section id="extension-post-section" class="section section--post" style="display:none;">
+      <h2 class="section__title">Write Your Introspection!</h2>
+      <a id="extension-option-a" class="a a--option" href="option.html">go to option -></a>
+      <textarea id="extension-post-textarea" class="textarea section__textarea section__textarea--post" placeholder="type your introspection!"></textarea>
     
-      <div class="buttons">
-        <button id="save" class="extension-button">save</button>
-        <button id="submitPost" class="extension-button">Submit</button>
+      <div class="div--buttonList">
+        <button id="extension-save-button" class="button button--save button--secondary">save</button>
+        <button id="extension-submit-button" class="button button--submit button--primary">Submit</button>
       </div>
       
     </section>
   
-    <footer class="extension-footer">
-      <div class="extension-information-link">
-        <a  href="chrome-extension://nkmemnehekmfeekceceegmaobidfpghm/welcome.html" target="_blank">homepage</a>
-      </div>
-      <div class="extension-information-link">
+    <footer class="footer">
+      <article class="footer__article--link">
+        <a href="chrome-extension://nkmemnehekmfeekceceegmaobidfpghm/welcome.html" target="_blank">homepage</a>
+      </article>
+      <article class="footer__article--link">
         <a href="mailto:hongjw030@naver.com">mail to</a>
-      </div>
-      <div class="extension-information-link">
+      </article>
+      <article class="footer__article--link">
         <a href="https://github.com/hongjw030/introspection-helper" target="_blank">repository</a>
-      </div>
+      </article>
     </footer>
 </main>
 
