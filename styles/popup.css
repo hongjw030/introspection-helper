@@ -113,3 +113,24 @@
   padding: 8px;
   border-radius: 8px
 }
+
+.p__article--habit{
+  background-color: #00bbaa;
+  font-weight: 600;
+  font-size: 1rem;
+  padding: 8px;
+  color: white;
+  border-radius: 8px;
+  position: relative;
+}
+.p__article--habit::after{
+  content:"";
+  width: 0px;
+  height: 0px;
+  border-bottom: 10px solid #00bbaa;
+  border-left: 15px solid transparent;
+  border-right: 5px solid transparent;
+  position: absolute;
+  top: -10px;
+  left: 30px;
+}
