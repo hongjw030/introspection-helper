@@ -1,17 +1,18 @@
+import { getUserNickname } from "./fetchers/getUserNickname";
 import { getDateInformation, getInitialFileName } from "./utils/getDate";
 import { encodeBase64 } from "./utils/setTextEncode";
 
 document.addEventListener('DOMContentLoaded', function() {
-  chrome.storage.local.get(['githubToken', 'selectedRepo', 'ownerName', 'savedText'], function(result) {
+  chrome.storage.local.get(['githubToken', 'selectedRepo', 'nickname', 'savedText'], function(result) {
     if (result.githubToken) {
       document.getElementById('extension-login-button').style.display = 'none';
       document.getElementById('extension-logout-button').style.display = 'block';
       document.getElementById('extension-user-section').style.display = 'flex';
-      if (result.ownerName) {
-        showOwnerName(result.ownerName);
+      if (result.nickname) {
+        showOwnerName(result.nickname);
         document.getElementById('extension-user-nickname-p').style.display = 'flex';
         if (result.selectedRepo) {
-          showSelectedRepo(result.selectedRepo, result.ownerName);
+          showSelectedRepo(result.selectedRepo, result.nickname);
           document.getElementById('extension-post-section').style.display = 'flex';
           document.getElementById('extension-user-selectedRepo-p').style.display = 'flex';
           if (result.savedText){
@@ -65,13 +66,13 @@ document.addEventListener('DOMContentLoaded', function() {
           document.getElementById('extension-logout-button').style.display = 'block';
           fetchRepos(token);
         });
-        fetchOwnerName(token);
+        getUserNickname(token);
       });
     });
   });
 
   document.getElementById('extension-logout-button').addEventListener('click', function() {
-    chrome.storage.local.remove(['githubToken', 'selectedRepo', 'ownerName', 'savedText'], function() {
+    chrome.storage.local.remove(['githubToken', 'selectedRepo', 'nickname', 'savedText'], function() {
       document.getElementById('extension-login-button').style.display = 'block';
       document.getElementById('extension-logout-button').style.display = 'none';
       document.getElementById('extension-user-section').style.display = 'none';
@@ -105,35 +106,19 @@ document.addEventListener('DOMContentLoaded', function() {
         const content = document.getElementById('extension-post-textarea').value;
 
         const fileName = `${getInitialFileName()}.md`;
-        chrome.storage.local.get('ownerName', function(ownerResult){
-          const ownerName = ownerResult.ownerName;
-          if (!ownerName){
+        chrome.storage.local.get('nickname', function(ownerResult){
+          const nickname = ownerResult.nickname;
+          if (!nickname){
             console.error('No owner name found');
             return;
           }
-          createFileAndCommit(token, repoName, fileName, content, ownerName);
+          createFileAndCommit(token, repoName, fileName, content, nickname);
         })
       });
     });
     chrome.storage.local.remove(['savedText'], function() {})
   });
 });
-
-function fetchOwnerName(token) {
-  console.log(token);
-  fetch('https://api.github.com/user', {
-    headers: {
-      Authorization: `token ${token}`
-    }
-  })
-  .then(response => response.json())
-  .then(userData => {
-    const ownerName = userData.login;
-    chrome.storage.local.set({ ownerName: ownerName }, function() {
-      console.log('Owner name stored:', ownerName);
-    });
-  });
-}
 
 function fetchRepos(token) {
   fetch('https://api.github.com/user/repos', {
@@ -142,10 +127,11 @@ function fetchRepos(token) {
     }
   }).then(response => response.json()).then(repos => {
     const repoList = document.getElementById('extension-repoList-ul');
-    let ownerName = ''
-    chrome.storage.local.get(['ownerName'], function(result){
-      if (result.ownerName) ownerName = result.ownerName;
+    let nickname = ''
+    chrome.storage.local.get(['nickname'], function(result){
+      if (result.nickname) nickname = result.nickname;
     })
+    console.log(nickname);
     repoList.innerHTML = '';
     if (repos.length > 0){
       repos.forEach(repo => {
@@ -154,7 +140,7 @@ function fetchRepos(token) {
         li.textContent = repo.name;
         li.addEventListener('click', function() {
           chrome.storage.local.set({ selectedRepo: repo.name }, function() {
-            showSelectedRepo(repo.name, ownerName);
+            showSelectedRepo(repo.name, nickname);
             document.getElementById('extension-post-section').style.display = 'flex';
           });
         });
@@ -167,24 +153,25 @@ function fetchRepos(token) {
   });
 }
 
-function showSelectedRepo(repoName, ownerName) {
+function showSelectedRepo(repoName, nickname) {
   document.getElementById('extension-repoList-section').style.display='none';
   document.getElementById('extension-user-section').style.display='flex';
   const selectedRepoSpan = document.getElementById('extension-user-selectedRepo-span');
-  selectedRepoSpan.innerHTML = `<a href="https://www.github.com/${ownerName}/${repoName}" target="_blank" class="highlighted">${repoName}</a>`;
+  selectedRepoSpan.innerHTML = `<a href="https://www.github.com/${nickname}/${repoName}" target="_blank" class="highlighted">${repoName}</a>`;
 }
 
-function showOwnerName(ownerName) {
-  const ownerNameSpan = document.getElementById('extension-user-nickname-span');
-  ownerNameSpan.innerHTML = `<a href="https://www.github.com/${ownerName}" target="_blank" class="highlighted">${ownerName}</a>`;
+function showOwnerName(nickname) {
+  const nicknameSpan = document.getElementById('extension-user-nickname-span');
+  console.log(nickname)
+  nicknameSpan.innerHTML = `<a href="https://www.github.com/${nickname}" target="_blank" class="highlighted">${nickname}</a>`;
 }
 
 
-function createFileAndCommit(token, repoName, fileName, content, ownerName) {
+function createFileAndCommit(token, repoName, fileName, content, nickname) {
   let latestCommitSha; // latestCommitSha 변수를 함수 내에서 선언
 
-  function createFileInFolder(token, repoName, fileName, content, ownerName, folderPath) {
-    fetch(`https://api.github.com/repos/${ownerName}/${repoName}/contents/${folderPath}`, {
+  function createFileInFolder(token, repoName, fileName, content, nickname, folderPath) {
+    fetch(`https://api.github.com/repos/${nickname}/${repoName}/contents/${folderPath}`, {
       method: 'GET',
       headers: {
         Authorization: `token ${token}`
@@ -193,10 +180,10 @@ function createFileAndCommit(token, repoName, fileName, content, ownerName) {
     .then(response => {
       if (response.status === 404) {
         // 폴더가 없으므로 생성
-        return createFolderAndFile(token, repoName, fileName, content, ownerName, folderPath);
+        return createFolderAndFile(token, repoName, fileName, content, nickname, folderPath);
       } else {
         // 폴더가 이미 존재하므로 파일 생성
-        return createNewFile(token, repoName, fileName, content, ownerName, folderPath);
+        return createNewFile(token, repoName, fileName, content, nickname, folderPath);
       }
     })
     .catch(error => {
@@ -204,7 +191,7 @@ function createFileAndCommit(token, repoName, fileName, content, ownerName) {
     });
   }
 
-  function createFolderAndFile(token, repoName, fileName, content, ownerName, folderPath) {
+  function createFolderAndFile(token, repoName, fileName, content, nickname, folderPath) {
     const folderName = folderPath.split('/').pop();
     const parentFolder = folderPath.split('/').slice(0, -1).join('/');
     const folderData = {
@@ -214,7 +201,7 @@ function createFileAndCommit(token, repoName, fileName, content, ownerName) {
       branch: 'main' // 변경 필요 시 수정
     };
 
-    fetch(`https://api.github.com/repos/${ownerName}/${repoName}/contents/${parentFolder}`, {
+    fetch(`https://api.github.com/repos/${nickname}/${repoName}/contents/${parentFolder}`, {
       method: 'GET',
       headers: {
         Authorization: `token ${token}`
@@ -224,7 +211,7 @@ function createFileAndCommit(token, repoName, fileName, content, ownerName) {
     .then(data => {
       const baseTreeSha = data.sha;
 
-      return fetch(`https://api.github.com/repos/${ownerName}/${repoName}/git/trees`, {
+      return fetch(`https://api.github.com/repos/${nickname}/${repoName}/git/trees`, {
         method: 'POST',
         headers: {
           Authorization: `token ${token}`,
@@ -245,7 +232,7 @@ function createFileAndCommit(token, repoName, fileName, content, ownerName) {
     .then(data => {
       const newTreeSha = data.sha;
 
-      return fetch(`https://api.github.com/repos/${ownerName}/${repoName}/git/commits`, {
+      return fetch(`https://api.github.com/repos/${nickname}/${repoName}/git/commits`, {
         method: 'POST',
         headers: {
           Authorization: `token ${token}`,
@@ -262,7 +249,7 @@ function createFileAndCommit(token, repoName, fileName, content, ownerName) {
     .then(data => {
       const newCommitSha = data.sha;
 
-      return fetch(`https://api.github.com/repos/${ownerName}/${repoName}/git/refs/heads/main`, {
+      return fetch(`https://api.github.com/repos/${nickname}/${repoName}/git/refs/heads/main`, {
         method: 'PATCH',
         headers: {
           Authorization: `token ${token}`,
@@ -275,15 +262,15 @@ function createFileAndCommit(token, repoName, fileName, content, ownerName) {
     })
     .then(() => {
       // 폴더 생성 후 파일 생성
-      return createNewFile(token, repoName, fileName, content, ownerName, folderPath);
+      return createNewFile(token, repoName, fileName, content, nickname, folderPath);
     })
     .catch(error => {
       console.error('Error:', error);
     });
   }
 
-  function createNewFile(token, repoName, fileName, content, ownerName, folderPath) {
-    fetch(`https://api.github.com/repos/${ownerName}/${repoName}/contents/${folderPath}/${fileName}`, {
+  function createNewFile(token, repoName, fileName, content, nickname, folderPath) {
+    fetch(`https://api.github.com/repos/${nickname}/${repoName}/contents/${folderPath}/${fileName}`, {
       method: 'GET',
       headers: {
         Authorization: `token ${token}`
@@ -292,7 +279,7 @@ function createFileAndCommit(token, repoName, fileName, content, ownerName) {
     .then(response => {
       if (response.status === 404) {
         // 파일이 존재하지 않으므로 생성
-        return fetch(`https://api.github.com/repos/${ownerName}/${repoName}/contents/${folderPath}/${fileName}`, {
+        return fetch(`https://api.github.com/repos/${nickname}/${repoName}/contents/${folderPath}/${fileName}`, {
           method: 'PUT',
           headers: {
             Authorization: `token ${token}`,
@@ -309,7 +296,7 @@ function createFileAndCommit(token, repoName, fileName, content, ownerName) {
         if (newFileName) {
           // 사용자가 새 파일 이름을 입력한 경우 파일 생성 함수 재귀 호출
           let myFileName = newFileName + ".md";
-          return createNewFile(token, repoName, myFileName, content, ownerName, folderPath);
+          return createNewFile(token, repoName, myFileName, content, nickname, folderPath);
         } else {
           // 사용자가 입력을 취소한 경우
           throw new Error('파일 이름 입력이 취소되었습니다.');
@@ -334,5 +321,5 @@ function createFileAndCommit(token, repoName, fileName, content, ownerName) {
   const [year, month, day] = getDateInformation();
   const folderPath = `${year}/${month}`;
 
-  createFileInFolder(token, repoName, fileName, content, ownerName, folderPath);
+  createFileInFolder(token, repoName, fileName, content, nickname, folderPath);
 }
