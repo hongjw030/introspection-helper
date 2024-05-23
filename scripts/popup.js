@@ -1,36 +1,42 @@
-import { getUserNickname } from "./fetchers/getUserNickname";
+import { getNickname } from "./fetchers/getNickname";
+import { getRepoList } from "./fetchers/getRepoList";
+import { getToken } from "./fetchers/getToken";
 import { getDateInformation, getInitialFileName } from "./utils/getDate";
 import { encodeBase64 } from "./utils/setTextEncode";
+import { setChooseRepoScreen } from "./visibilities/setChooseRepoScreen";
+import { setLogoutScreen } from "./visibilities/setLogoutScreen";
+import { setNicknameScreen } from "./visibilities/setNicknameScreen";
+import { setReadyToPostScreen } from "./visibilities/setReadyToPostScreen";
+import { setRepoListScreen } from "./visibilities/setRepoListScreen";
+import { setSelectedRepoScreen } from "./visibilities/setSelectedRepoScreen";
 
 document.addEventListener('DOMContentLoaded', function() {
-  chrome.storage.local.get(['githubToken', 'selectedRepo', 'nickname', 'savedText'], function(result) {
+  chrome.storage.local.get(['githubToken', 'selectedRepo', 'nickname', 'savedText'], async function(result) {
+    // 깃헙 토큰이 있다면 로그인된 상태.
     if (result.githubToken) {
-      document.getElementById('extension-login-button').style.display = 'none';
-      document.getElementById('extension-logout-button').style.display = 'block';
-      document.getElementById('extension-user-section').style.display = 'flex';
-      if (result.nickname) {
-        showOwnerName(result.nickname);
-        document.getElementById('extension-user-nickname-p').style.display = 'flex';
-        if (result.selectedRepo) {
-          showSelectedRepo(result.selectedRepo, result.nickname);
-          document.getElementById('extension-post-section').style.display = 'flex';
-          document.getElementById('extension-user-selectedRepo-p').style.display = 'flex';
-          if (result.savedText){
-            const textarea = document.getElementById('extension-post-textarea');
-            textarea.value = result.savedText;
-          }
-        } else {
-          fetchRepos(result.githubToken);
+      // 이미 레포를 선택했었다면
+      if (result.selectedRepo) {
+        setReadyToPostScreen(result.nickname, result.selectedRepo);
+        setNicknameScreen(result.nickname);
+        setSelectedRepoScreen(result.selectedRepo, result.nickname);
+        // 저장했던 글이 있다면 불러오기.
+        if (result.savedText){
+          const textarea = document.getElementById('extension-post-textarea');
+          textarea.value = result.savedText;
         }
       } else {
-        fetchRepos(result.githubToken);
+        // 레포 선택안한 채로 창을 끄면 재로그인해야 함.
+        chrome.storage.local.remove(['githubToken', 'selectedRepo', 'nickname', 'savedText'], ()=> {
+          setLogoutScreen();
+        });
       }
     } else {
-      document.getElementById('extension-login-button').style.display = 'block';
-      document.getElementById('extension-logout-button').style.display = 'none';
+      // github 토큰이 없다면 로그인이 안된 상태이므로 LogoutScreen 상태 보여짐.
+      setLogoutScreen();
     }
   });
 
+  // 로그인 버튼 기능
   document.getElementById('extension-login-button').addEventListener('click', function() {
     const redirectUri = chrome.identity.getRedirectURL();
     const authUrl = `https://github.com/login/oauth/authorize?client_id=Ov23liS8uJ1LJSioNTPc&redirect_uri=${encodeURIComponent(redirectUri)}&scope=repo`;
@@ -38,7 +44,7 @@ document.addEventListener('DOMContentLoaded', function() {
     chrome.identity.launchWebAuthFlow({
       url: authUrl,
       interactive: true
-    }, function(redirectUrl) {
+    }, async function(redirectUrl) {
       if (chrome.runtime.lastError) {
         console.error(chrome.runtime.lastError.message);
         return;
@@ -46,49 +52,36 @@ document.addEventListener('DOMContentLoaded', function() {
 
       const params = new URLSearchParams(new URL(redirectUrl).search);
       const code = params.get('code');
-
-      fetch('https://github.com/login/oauth/access_token', {
-        method: 'POST',
-        headers: {
-          'Accept': 'application/json',
-          'Content-Type': 'application/json'
-        },
-        body: JSON.stringify({
-          client_id: 'Ov23liS8uJ1LJSioNTPc',
-          client_secret: '904fcc78be315af16780349f2f74d701aeb3fd34',
-          code: code,
-          redirect_uri: redirectUri
-        })
-      }).then(response => response.json()).then(data => {
-        const token = data.access_token;
-        chrome.storage.local.set({ githubToken: token }, function() {
-          document.getElementById('extension-login-button').style.display = 'none';
-          document.getElementById('extension-logout-button').style.display = 'block';
-          fetchRepos(token);
-        });
-        getUserNickname(token);
+      // 로그인 시 토큰 받아오기
+      const token = await getToken(code, redirectUri);
+      chrome.storage.local.set({githubToken: token}, ()=>{
+        setChooseRepoScreen();
+      })
+      // 토큰 받으면 바로 유저 닉네임 받아오기
+      const nickname = await getNickname(token);
+      chrome.storage.local.set({nickname: nickname}, ()=>{
       });
+      // 유저 닉네임 받으면 바로 레포 리스트 받아오기
+      const repoList = await getRepoList(token);
+      setRepoListScreen(repoList, nickname);
     });
   });
 
+  // 로그아웃 버튼 기능
   document.getElementById('extension-logout-button').addEventListener('click', function() {
-    chrome.storage.local.remove(['githubToken', 'selectedRepo', 'nickname', 'savedText'], function() {
-      document.getElementById('extension-login-button').style.display = 'block';
-      document.getElementById('extension-logout-button').style.display = 'none';
-      document.getElementById('extension-user-section').style.display = 'none';
-      document.getElementById('extension-repoList-section').style.display = 'none';
-      document.getElementById('extension-post-section').style.display = 'none';
+    chrome.storage.local.remove(['githubToken', 'selectedRepo', 'nickname', 'savedText'], ()=> {
+      setLogoutScreen();
     });
-    let token = chrome.storage.local.get('githubToken');
-    console.log(token)
   });
 
+// 임시저장 버튼 기능
   document.getElementById('extension-save-button').addEventListener('click', function(){
     const textarea = document.getElementById('extension-post-textarea');
     chrome.storage.local.set({savedText: textarea.value});
     alert("임시 저장되었습니다! submit 버튼으로 제출하면 자동으로 저장된 내용은 사라집니다.");
   })
 
+  // 제출 버튼 기능
   document.getElementById('extension-submit-button').addEventListener('click', function() {
     chrome.storage.local.get('githubToken', function(result) {
       const token = result.githubToken;
@@ -119,53 +112,6 @@ document.addEventListener('DOMContentLoaded', function() {
     chrome.storage.local.remove(['savedText'], function() {})
   });
 });
-
-function fetchRepos(token) {
-  fetch('https://api.github.com/user/repos', {
-    headers: {
-      Authorization: `token ${token}`
-    }
-  }).then(response => response.json()).then(repos => {
-    const repoList = document.getElementById('extension-repoList-ul');
-    let nickname = ''
-    chrome.storage.local.get(['nickname'], function(result){
-      if (result.nickname) nickname = result.nickname;
-    })
-    console.log(nickname);
-    repoList.innerHTML = '';
-    if (repos.length > 0){
-      repos.forEach(repo => {
-        const li = document.createElement('li');
-        li.setAttribute('class', "extension-li")
-        li.textContent = repo.name;
-        li.addEventListener('click', function() {
-          chrome.storage.local.set({ selectedRepo: repo.name }, function() {
-            showSelectedRepo(repo.name, nickname);
-            document.getElementById('extension-post-section').style.display = 'flex';
-          });
-        });
-        repoList.appendChild(li);
-      });
-    }else{
-      repoList.innerHTML = "Your repository not exist!! Please make your own."
-    }
-    document.getElementById('extension-repoList-section').style.display = 'flex';
-  });
-}
-
-function showSelectedRepo(repoName, nickname) {
-  document.getElementById('extension-repoList-section').style.display='none';
-  document.getElementById('extension-user-section').style.display='flex';
-  const selectedRepoSpan = document.getElementById('extension-user-selectedRepo-span');
-  selectedRepoSpan.innerHTML = `<a href="https://www.github.com/${nickname}/${repoName}" target="_blank" class="highlighted">${repoName}</a>`;
-}
-
-function showOwnerName(nickname) {
-  const nicknameSpan = document.getElementById('extension-user-nickname-span');
-  console.log(nickname)
-  nicknameSpan.innerHTML = `<a href="https://www.github.com/${nickname}" target="_blank" class="highlighted">${nickname}</a>`;
-}
-
 
 function createFileAndCommit(token, repoName, fileName, content, nickname) {
   let latestCommitSha; // latestCommitSha 변수를 함수 내에서 선언
