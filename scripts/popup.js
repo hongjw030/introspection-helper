@@ -1,32 +1,38 @@
 import { getNickname } from "./fetchers/getNickname";
+import { getRepoList } from "./fetchers/getRepoList";
 import { getToken } from "./fetchers/getToken";
-import { getUserNickname } from "./fetchers/getUserNickname";
 import { getDateInformation, getInitialFileName } from "./utils/getDate";
 import { encodeBase64 } from "./utils/setTextEncode";
 import { setChooseRepoScreen } from "./visibilities/setChooseRepoScreen";
+import { setLogoutScreen } from "./visibilities/setLogoutScreen";
+import { setNicknameScreen } from "./visibilities/setNicknameScreen";
+import { setRepoListScreen } from "./visibilities/setRepoListScreen";
+import { setSelectedRepoScreen } from "./visibilities/setSelectedRepoScreen";
 
 document.addEventListener('DOMContentLoaded', function() {
-  chrome.storage.local.get(['githubToken', 'selectedRepo', 'nickname', 'savedText'], function(result) {
+  chrome.storage.local.get(['githubToken', 'selectedRepo', 'nickname', 'savedText'], async function(result) {
     if (result.githubToken) {
       document.getElementById('extension-login-button').style.display = 'none';
-      document.getElementById('extension-logout-button').style.display = 'block';
+      document.getElementById('extension-logout-button').style.display = 'flex';
       document.getElementById('extension-user-section').style.display = 'flex';
       if (result.nickname) {
-        showOwnerName(result.nickname);
+        setNicknameScreen(result.nickname);
         document.getElementById('extension-user-nickname-p').style.display = 'flex';
         if (result.selectedRepo) {
-          showSelectedRepo(result.selectedRepo, result.nickname);
           document.getElementById('extension-post-section').style.display = 'flex';
           document.getElementById('extension-user-selectedRepo-p').style.display = 'flex';
+          setSelectedRepoScreen(result.selectedRepo, result.nickname);
           if (result.savedText){
             const textarea = document.getElementById('extension-post-textarea');
             textarea.value = result.savedText;
           }
         } else {
-          fetchRepos(result.githubToken);
+          const repoList = await getRepoList(result.token);
+          setRepoListScreen(repoList, result.nickname);
         }
       } else {
-        fetchRepos(result.githubToken);
+        const repoList = await getRepoList(result.token);
+        setRepoListScreen(repoList, result.nickname);
       }
     } else {
       document.getElementById('extension-login-button').style.display = 'block';
@@ -49,48 +55,26 @@ document.addEventListener('DOMContentLoaded', function() {
 
       const params = new URLSearchParams(new URL(redirectUrl).search);
       const code = params.get('code');
+      // 로그인 시 토큰 받아오기
       const token = await getToken(code, redirectUri);
       chrome.storage.local.set({githubToken: token}, ()=>{
         setChooseRepoScreen();
       })
+      // 토큰 받으면 바로 유저 닉네임 받아오기
       const nickname = await getNickname(token);
       chrome.storage.local.set({nickname: nickname}, (result)=>{
         console.log(result.nickname)
       });
-      fetchRepos(token);
-
-      // fetch('https://github.com/login/oauth/access_token', {
-      //   method: 'POST',
-      //   headers: {
-      //     'Accept': 'application/json',
-      //     'Content-Type': 'application/json'
-      //   },
-      //   body: JSON.stringify({
-      //     client_id: 'Ov23liS8uJ1LJSioNTPc',
-      //     client_secret: '904fcc78be315af16780349f2f74d701aeb3fd34',
-      //     code: code,
-      //     redirect_uri: redirectUri
-      //   })
-      // }).then(response => response.json()).then(data => {
-      //   const token = data.access_token;
-      //   chrome.storage.local.set({ githubToken: token }, function() {
-      //     document.getElementById('extension-login-button').style.display = 'none';
-      //     document.getElementById('extension-logout-button').style.display = 'block';
-      //   });
-      // });
+      // 유저 닉네임 받으면 바로 레포 리스트 받아오기
+      const repoList = await getRepoList(token);
+      setRepoListScreen(repoList, nickname);
     });
   });
 
   document.getElementById('extension-logout-button').addEventListener('click', function() {
-    chrome.storage.local.remove(['githubToken', 'selectedRepo', 'nickname', 'savedText'], function() {
-      document.getElementById('extension-login-button').style.display = 'block';
-      document.getElementById('extension-logout-button').style.display = 'none';
-      document.getElementById('extension-user-section').style.display = 'none';
-      document.getElementById('extension-repoList-section').style.display = 'none';
-      document.getElementById('extension-post-section').style.display = 'none';
+    chrome.storage.local.remove(['githubToken', 'selectedRepo', 'nickname', 'savedText'], ()=> {
+      setLogoutScreen();
     });
-    let token = chrome.storage.local.get('githubToken');
-    console.log(token)
   });
 
   document.getElementById('extension-save-button').addEventListener('click', function(){
@@ -129,53 +113,6 @@ document.addEventListener('DOMContentLoaded', function() {
     chrome.storage.local.remove(['savedText'], function() {})
   });
 });
-
-function fetchRepos(token) {
-  fetch('https://api.github.com/user/repos', {
-    headers: {
-      Authorization: `token ${token}`
-    }
-  }).then(response => response.json()).then(repos => {
-    const repoList = document.getElementById('extension-repoList-ul');
-    let nickname = ''
-    chrome.storage.local.get(['nickname'], function(result){
-      if (result.nickname) nickname = result.nickname;
-    })
-    console.log(nickname);
-    repoList.innerHTML = '';
-    if (repos.length > 0){
-      repos.forEach(repo => {
-        const li = document.createElement('li');
-        li.setAttribute('class', "extension-li")
-        li.textContent = repo.name;
-        li.addEventListener('click', function() {
-          chrome.storage.local.set({ selectedRepo: repo.name }, function() {
-            showSelectedRepo(repo.name, nickname);
-            document.getElementById('extension-post-section').style.display = 'flex';
-          });
-        });
-        repoList.appendChild(li);
-      });
-    }else{
-      repoList.innerHTML = "Your repository not exist!! Please make your own."
-    }
-    document.getElementById('extension-repoList-section').style.display = 'flex';
-  });
-}
-
-function showSelectedRepo(repoName, nickname) {
-  document.getElementById('extension-repoList-section').style.display='none';
-  document.getElementById('extension-user-section').style.display='flex';
-  const selectedRepoSpan = document.getElementById('extension-user-selectedRepo-span');
-  selectedRepoSpan.innerHTML = `<a href="https://www.github.com/${nickname}/${repoName}" target="_blank" class="highlighted">${repoName}</a>`;
-}
-
-function showOwnerName(nickname) {
-  const nicknameSpan = document.getElementById('extension-user-nickname-span');
-  console.log(nickname)
-  nicknameSpan.innerHTML = `<a href="https://www.github.com/${nickname}" target="_blank" class="highlighted">${nickname}</a>`;
-}
-
 
 function createFileAndCommit(token, repoName, fileName, content, nickname) {
   let latestCommitSha; // latestCommitSha 변수를 함수 내에서 선언
