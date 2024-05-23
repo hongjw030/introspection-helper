@@ -7,19 +7,16 @@
   <link rel="stylesheet" href="./styles/option.css">
   <!-- <script type="module" src="./dist/bundle.js"></script> -->
 </head>
-<body id="page-body">
-  <main class="extension-main">
-    <header class="extension-header">
-      <p class="extension-title">
-        <span class="highlighted">Introspection </span>
-        Helper
-      </p>
-      <div>
-        <a id="popupLink" class="extension-goto" href="popup.html"><- go back to textarea</a>
-      </div>
+<body id="extension-option-body">
+  <main class="main">
+    <header class="header">
+      <span class="header__span text--highlighted">Introspection </span>
+      <span class="header__span">Helper </span>
     </header>
+
+    <a id="extension-option-popup-a" class="a a--popup" href="popup.html"><- go back to textarea</a>
     
-    <section id="option-section-clock" class="extension-section">
+    <section id="extension-option-clock-section" class="section section--clock">
       1. 오늘 며칠인지 볼수 있는 기능 checkbox 
       <br/>
       2. 오늘 회고 썼는지 볼수 있는기능 checkbox
@@ -28,7 +25,7 @@
       <br/>
     </section>
 
-    <section id="option-section-name" class="extension-section">
+    <section id="extension-option-convention-section" class="section section--convention">
       1. 폴더 이름 바꾸는 기능 input / save 버튼 / 현재 폴더 이름 text / reset 버튼
       <br/>
       2. 파일 이름 바꾸는 기능 input / save 버튼 / 현재 파일 이름 text / reset 버튼
@@ -37,7 +34,7 @@
       <br/>
     </section>
     
-    <section id="option-section-template" class="extension-section">
+    <section id="extension-option-template-section" class="section section--template">
       1. 현재 적용된 템플릿: text / reset 버튼
       <br/>
       2. 템플릿 새로 만들기: textarea / save 버튼
