@@ -2,6 +2,58 @@
 /******/ 	"use strict";
 /******/ 	var __webpack_modules__ = ({
 
+/***/ "./scripts/utils/getDate.js":
+/*!**********************************!*\
+  !*** ./scripts/utils/getDate.js ***!
+  \**********************************/
+/***/ ((__unused_webpack_module, __webpack_exports__, __webpack_require__) => {
+
+__webpack_require__.r(__webpack_exports__);
+/* harmony export */ __webpack_require__.d(__webpack_exports__, {
+/* harmony export */   getDateInformation: () => (/* binding */ getDateInformation),
+/* harmony export */   getInitialFileName: () => (/* binding */ getInitialFileName)
+/* harmony export */ });
+function _slicedToArray(arr, i) { return _arrayWithHoles(arr) || _iterableToArrayLimit(arr, i) || _unsupportedIterableToArray(arr, i) || _nonIterableRest(); }
+function _nonIterableRest() { throw new TypeError("Invalid attempt to destructure non-iterable instance.\nIn order to be iterable, non-array objects must have a [Symbol.iterator]() method."); }
+function _unsupportedIterableToArray(o, minLen) { if (!o) return; if (typeof o === "string") return _arrayLikeToArray(o, minLen); var n = Object.prototype.toString.call(o).slice(8, -1); if (n === "Object" && o.constructor) n = o.constructor.name; if (n === "Map" || n === "Set") return Array.from(o); if (n === "Arguments" || /^(?:Ui|I)nt(?:8|16|32)(?:Clamped)?Array$/.test(n)) return _arrayLikeToArray(o, minLen); }
+function _arrayLikeToArray(arr, len) { if (len == null || len > arr.length) len = arr.length; for (var i = 0, arr2 = new Array(len); i < len; i++) arr2[i] = arr[i]; return arr2; }
+function _iterableToArrayLimit(r, l) { var t = null == r ? null : "undefined" != typeof Symbol && r[Symbol.iterator] || r["@@iterator"]; if (null != t) { var e, n, i, u, a = [], f = !0, o = !1; try { if (i = (t = t.call(r)).next, 0 === l) { if (Object(t) !== t) return; f = !1; } else for (; !(f = (e = i.call(t)).done) && (a.push(e.value), a.length !== l); f = !0); } catch (r) { o = !0, n = r; } finally { try { if (!f && null != t["return"] && (u = t["return"](), Object(u) !== u)) return; } finally { if (o) throw n; } } return a; } }
+function _arrayWithHoles(arr) { if (Array.isArray(arr)) return arr; }
+/*
+ * 현재 날짜 리턴 함수
+ * 
+ * desc: 오늘의 날짜를 [year, month, day] 배열에 담아 리턴하는 함수.
+ * params: 
+ * returns: [year: string, month: string, day: string]
+ * test: 
+ */
+function getDateInformation() {
+  var today = new Date();
+  var year = today.getFullYear().toString();
+  var month = (today.getMonth() + 1).toString().padStart(2, '0'); // 월은 0부터 시작하므로 +1 필요
+  var day = today.getDate().toString().padStart(2, '0');
+  return [year, month, day];
+}
+
+/*
+ * 파일 이름 리턴 함수
+ * 
+ * desc: introspection.md 파일의 이름을 오늘 날짜에 맞춰 생성하는 함수
+ * params: 
+ * returns: `{year}{month}{day}`
+ * test: 
+ */
+function getInitialFileName() {
+  var _getDateInformation = getDateInformation(),
+    _getDateInformation2 = _slicedToArray(_getDateInformation, 3),
+    year = _getDateInformation2[0],
+    month = _getDateInformation2[1],
+    day = _getDateInformation2[2];
+  return "".concat(year).concat(month).concat(day);
+}
+
+/***/ }),
+
 /***/ "./scripts/utils/setTextEncode.js":
 /*!****************************************!*\
   !*** ./scripts/utils/setTextEncode.js ***!
@@ -114,7 +166,15 @@ var __webpack_exports__ = {};
   !*** ./scripts/popup.js ***!
   \**************************/
 __webpack_require__.r(__webpack_exports__);
-/* harmony import */ var _utils_setTextEncode__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! ./utils/setTextEncode */ "./scripts/utils/setTextEncode.js");
+/* harmony import */ var _utils_getDate__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! ./utils/getDate */ "./scripts/utils/getDate.js");
+/* harmony import */ var _utils_setTextEncode__WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(/*! ./utils/setTextEncode */ "./scripts/utils/setTextEncode.js");
+function _slicedToArray(arr, i) { return _arrayWithHoles(arr) || _iterableToArrayLimit(arr, i) || _unsupportedIterableToArray(arr, i) || _nonIterableRest(); }
+function _nonIterableRest() { throw new TypeError("Invalid attempt to destructure non-iterable instance.\nIn order to be iterable, non-array objects must have a [Symbol.iterator]() method."); }
+function _unsupportedIterableToArray(o, minLen) { if (!o) return; if (typeof o === "string") return _arrayLikeToArray(o, minLen); var n = Object.prototype.toString.call(o).slice(8, -1); if (n === "Object" && o.constructor) n = o.constructor.name; if (n === "Map" || n === "Set") return Array.from(o); if (n === "Arguments" || /^(?:Ui|I)nt(?:8|16|32)(?:Clamped)?Array$/.test(n)) return _arrayLikeToArray(o, minLen); }
+function _arrayLikeToArray(arr, len) { if (len == null || len > arr.length) len = arr.length; for (var i = 0, arr2 = new Array(len); i < len; i++) arr2[i] = arr[i]; return arr2; }
+function _iterableToArrayLimit(r, l) { var t = null == r ? null : "undefined" != typeof Symbol && r[Symbol.iterator] || r["@@iterator"]; if (null != t) { var e, n, i, u, a = [], f = !0, o = !1; try { if (i = (t = t.call(r)).next, 0 === l) { if (Object(t) !== t) return; f = !1; } else for (; !(f = (e = i.call(t)).done) && (a.push(e.value), a.length !== l); f = !0); } catch (r) { o = !0, n = r; } finally { try { if (!f && null != t["return"] && (u = t["return"](), Object(u) !== u)) return; } finally { if (o) throw n; } } return a; } }
+function _arrayWithHoles(arr) { if (Array.isArray(arr)) return arr; }
+
 
 document.addEventListener('DOMContentLoaded', function () {
   chrome.storage.local.get(['githubToken', 'selectedRepo', 'ownerName', 'savedText'], function (result) {
@@ -216,7 +276,7 @@ document.addEventListener('DOMContentLoaded', function () {
           return;
         }
         var content = document.getElementById('extension-post-textarea').value;
-        var fileName = "".concat(getCurrentDate(), ".md");
+        var fileName = "".concat((0,_utils_getDate__WEBPACK_IMPORTED_MODULE_0__.getInitialFileName)(), ".md");
         chrome.storage.local.get('ownerName', function (ownerResult) {
           var ownerName = ownerResult.ownerName;
           if (!ownerName) {
@@ -230,13 +290,6 @@ document.addEventListener('DOMContentLoaded', function () {
     chrome.storage.local.remove(['savedText'], function () {});
   });
 });
-function getCurrentDate() {
-  var today = new Date();
-  var year = today.getFullYear();
-  var month = (today.getMonth() + 1).toString().padStart(2, '0'); // 월은 0부터 시작하므로 +1 필요
-  var day = today.getDate().toString().padStart(2, '0');
-  return "".concat(year).concat(month).concat(day);
-}
 function fetchOwnerName(token) {
   console.log(token);
   fetch('https://api.github.com/user', {
@@ -326,7 +379,7 @@ function createFileAndCommit(token, repoName, fileName, content, ownerName) {
     var folderData = {
       path: folderPath,
       message: 'Create new folder',
-      content: (0,_utils_setTextEncode__WEBPACK_IMPORTED_MODULE_0__.encodeBase64)(''),
+      content: (0,_utils_setTextEncode__WEBPACK_IMPORTED_MODULE_1__.encodeBase64)(''),
       // 빈 내용으로 폴더 생성
       branch: 'main' // 변경 필요 시 수정
     };
@@ -410,7 +463,7 @@ function createFileAndCommit(token, repoName, fileName, content, ownerName) {
           },
           body: JSON.stringify({
             message: 'Create new Markdown file',
-            content: (0,_utils_setTextEncode__WEBPACK_IMPORTED_MODULE_0__.encodeBase64)(content) // encode content to base64
+            content: (0,_utils_setTextEncode__WEBPACK_IMPORTED_MODULE_1__.encodeBase64)(content) // encode content to base64
           })
         });
       } else {
@@ -439,9 +492,11 @@ function createFileAndCommit(token, repoName, fileName, content, ownerName) {
       console.error('Error:', error);
     });
   }
-  var currentDate = new Date();
-  var year = currentDate.getFullYear();
-  var month = String(currentDate.getMonth() + 1).padStart(2, '0');
+  var _getDateInformation = (0,_utils_getDate__WEBPACK_IMPORTED_MODULE_0__.getDateInformation)(),
+    _getDateInformation2 = _slicedToArray(_getDateInformation, 3),
+    year = _getDateInformation2[0],
+    month = _getDateInformation2[1],
+    day = _getDateInformation2[2];
   var folderPath = "".concat(year, "/").concat(month);
   createFileInFolder(token, repoName, fileName, content, ownerName, folderPath);
 }
