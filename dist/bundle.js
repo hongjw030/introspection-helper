@@ -1,14 +1,121 @@
 /******/ (() => { // webpackBootstrap
-var __webpack_exports__ = {};
-/*!**************************!*\
-  !*** ./scripts/popup.js ***!
-  \**************************/
+/******/ 	"use strict";
+/******/ 	var __webpack_modules__ = ({
+
+/***/ "./scripts/utils/setTextCode.js":
+/*!**************************************!*\
+  !*** ./scripts/utils/setTextCode.js ***!
+  \**************************************/
+/***/ ((__unused_webpack_module, __webpack_exports__, __webpack_require__) => {
+
+__webpack_require__.r(__webpack_exports__);
+/* harmony export */ __webpack_require__.d(__webpack_exports__, {
+/* harmony export */   decodeBase64: () => (/* binding */ decodeBase64),
+/* harmony export */   encodeBase64: () => (/* binding */ encodeBase64)
+/* harmony export */ });
 function _toConsumableArray(arr) { return _arrayWithoutHoles(arr) || _iterableToArray(arr) || _unsupportedIterableToArray(arr) || _nonIterableSpread(); }
 function _nonIterableSpread() { throw new TypeError("Invalid attempt to spread non-iterable instance.\nIn order to be iterable, non-array objects must have a [Symbol.iterator]() method."); }
 function _unsupportedIterableToArray(o, minLen) { if (!o) return; if (typeof o === "string") return _arrayLikeToArray(o, minLen); var n = Object.prototype.toString.call(o).slice(8, -1); if (n === "Object" && o.constructor) n = o.constructor.name; if (n === "Map" || n === "Set") return Array.from(o); if (n === "Arguments" || /^(?:Ui|I)nt(?:8|16|32)(?:Clamped)?Array$/.test(n)) return _arrayLikeToArray(o, minLen); }
 function _iterableToArray(iter) { if (typeof Symbol !== "undefined" && iter[Symbol.iterator] != null || iter["@@iterator"] != null) return Array.from(iter); }
 function _arrayWithoutHoles(arr) { if (Array.isArray(arr)) return _arrayLikeToArray(arr); }
 function _arrayLikeToArray(arr, len) { if (len == null || len > arr.length) len = arr.length; for (var i = 0, arr2 = new Array(len); i < len; i++) arr2[i] = arr[i]; return arr2; }
+/*
+ * input -> base64 텍스트 변환 함수
+ * 
+ * desc: 한글, 이모지 등 특정 문자는 base64로 인식되지 않는 문제로 encode, decode 함수를 새로 정의함.
+ * params: string형 문자열
+ * returns: base64로 인코딩된 문자열
+ * test: 
+ */
+function encodeBase64(input) {
+  var utf8Bytes = new TextEncoder().encode(input);
+  return btoa(String.fromCharCode.apply(String, _toConsumableArray(utf8Bytes)));
+}
+
+/*
+ * base64 텍스트 -> utf8텍스트 변환 함수
+ * 
+ * desc: 한글, 이모지 등 특정 문자는 base64로 인식되지 않는 문제로 encode, decode 함수를 새로 정의함.
+ * params: base64로 인코딩된 문자열
+ * returns: 일반 text로 decode한 문자열
+ * test: 
+ */
+function decodeBase64(base64) {
+  var binaryString = atob(base64);
+  var bytes = new Uint8Array(binaryString.length);
+  for (var i = 0; i < binaryString.length; i++) {
+    bytes[i] = binaryString.charCodeAt(i);
+  }
+  return new TextDecoder().decode(bytes);
+}
+
+/***/ })
+
+/******/ 	});
+/************************************************************************/
+/******/ 	// The module cache
+/******/ 	var __webpack_module_cache__ = {};
+/******/ 	
+/******/ 	// The require function
+/******/ 	function __webpack_require__(moduleId) {
+/******/ 		// Check if module is in cache
+/******/ 		var cachedModule = __webpack_module_cache__[moduleId];
+/******/ 		if (cachedModule !== undefined) {
+/******/ 			return cachedModule.exports;
+/******/ 		}
+/******/ 		// Create a new module (and put it into the cache)
+/******/ 		var module = __webpack_module_cache__[moduleId] = {
+/******/ 			// no module.id needed
+/******/ 			// no module.loaded needed
+/******/ 			exports: {}
+/******/ 		};
+/******/ 	
+/******/ 		// Execute the module function
+/******/ 		__webpack_modules__[moduleId](module, module.exports, __webpack_require__);
+/******/ 	
+/******/ 		// Return the exports of the module
+/******/ 		return module.exports;
+/******/ 	}
+/******/ 	
+/************************************************************************/
+/******/ 	/* webpack/runtime/define property getters */
+/******/ 	(() => {
+/******/ 		// define getter functions for harmony exports
+/******/ 		__webpack_require__.d = (exports, definition) => {
+/******/ 			for(var key in definition) {
+/******/ 				if(__webpack_require__.o(definition, key) && !__webpack_require__.o(exports, key)) {
+/******/ 					Object.defineProperty(exports, key, { enumerable: true, get: definition[key] });
+/******/ 				}
+/******/ 			}
+/******/ 		};
+/******/ 	})();
+/******/ 	
+/******/ 	/* webpack/runtime/hasOwnProperty shorthand */
+/******/ 	(() => {
+/******/ 		__webpack_require__.o = (obj, prop) => (Object.prototype.hasOwnProperty.call(obj, prop))
+/******/ 	})();
+/******/ 	
+/******/ 	/* webpack/runtime/make namespace object */
+/******/ 	(() => {
+/******/ 		// define __esModule on exports
+/******/ 		__webpack_require__.r = (exports) => {
+/******/ 			if(typeof Symbol !== 'undefined' && Symbol.toStringTag) {
+/******/ 				Object.defineProperty(exports, Symbol.toStringTag, { value: 'Module' });
+/******/ 			}
+/******/ 			Object.defineProperty(exports, '__esModule', { value: true });
+/******/ 		};
+/******/ 	})();
+/******/ 	
+/************************************************************************/
+var __webpack_exports__ = {};
+// This entry need to be wrapped in an IIFE because it need to be isolated against other modules in the chunk.
+(() => {
+/*!**************************!*\
+  !*** ./scripts/popup.js ***!
+  \**************************/
+__webpack_require__.r(__webpack_exports__);
+/* harmony import */ var _utils_setTextCode__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! ./utils/setTextCode */ "./scripts/utils/setTextCode.js");
+
 document.addEventListener('DOMContentLoaded', function () {
   chrome.storage.local.get(['githubToken', 'selectedRepo', 'ownerName', 'savedText'], function (result) {
     if (result.githubToken) {
@@ -123,18 +230,6 @@ document.addEventListener('DOMContentLoaded', function () {
     chrome.storage.local.remove(['savedText'], function () {});
   });
 });
-function encodeBase64(input) {
-  var utf8Bytes = new TextEncoder().encode(input);
-  return btoa(String.fromCharCode.apply(String, _toConsumableArray(utf8Bytes)));
-}
-function decodeBase64(base64) {
-  var binaryString = atob(base64);
-  var bytes = new Uint8Array(binaryString.length);
-  for (var i = 0; i < binaryString.length; i++) {
-    bytes[i] = binaryString.charCodeAt(i);
-  }
-  return new TextDecoder().decode(bytes);
-}
 function getCurrentDate() {
   var today = new Date();
   var year = today.getFullYear();
@@ -231,7 +326,7 @@ function createFileAndCommit(token, repoName, fileName, content, ownerName) {
     var folderData = {
       path: folderPath,
       message: 'Create new folder',
-      content: encodeBase64(''),
+      content: (0,_utils_setTextCode__WEBPACK_IMPORTED_MODULE_0__.encodeBase64)(''),
       // 빈 내용으로 폴더 생성
       branch: 'main' // 변경 필요 시 수정
     };
@@ -315,7 +410,7 @@ function createFileAndCommit(token, repoName, fileName, content, ownerName) {
           },
           body: JSON.stringify({
             message: 'Create new Markdown file',
-            content: encodeBase64(content) // encode content to base64
+            content: (0,_utils_setTextCode__WEBPACK_IMPORTED_MODULE_0__.encodeBase64)(content) // encode content to base64
           })
         });
       } else {
@@ -350,6 +445,8 @@ function createFileAndCommit(token, repoName, fileName, content, ownerName) {
   var folderPath = "".concat(year, "/").concat(month);
   createFileInFolder(token, repoName, fileName, content, ownerName, folderPath);
 }
+})();
+
 /******/ })()
 ;
 //# sourceMappingURL=bundle.js.map
