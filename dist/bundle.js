@@ -2,6 +2,41 @@
 /******/ 	"use strict";
 /******/ 	var __webpack_modules__ = ({
 
+/***/ "./scripts/fetchers/getUserNickname.js":
+/*!*********************************************!*\
+  !*** ./scripts/fetchers/getUserNickname.js ***!
+  \*********************************************/
+/***/ ((__unused_webpack_module, __webpack_exports__, __webpack_require__) => {
+
+__webpack_require__.r(__webpack_exports__);
+/* harmony export */ __webpack_require__.d(__webpack_exports__, {
+/* harmony export */   getUserNickname: () => (/* binding */ getUserNickname)
+/* harmony export */ });
+/*
+ * 유저 닉네임 리턴 함수
+ * 
+ * desc: token 값을 가지고 현재 로그인한 유저의 깃허브 닉네임을 알아와 nickname 에 저장하는 함수.
+ * params: 문자열 token
+ * returns: 
+ * test: 
+ */
+function getUserNickname(token) {
+  fetch('https://api.github.com/user', {
+    headers: {
+      Authorization: "token ".concat(token)
+    }
+  }).then(function (response) {
+    return response.json();
+  }).then(function (userData) {
+    var nickname = userData.login;
+    chrome.storage.local.set({
+      nickname: nickname
+    }, function () {});
+  });
+}
+
+/***/ }),
+
 /***/ "./scripts/utils/getDate.js":
 /*!**********************************!*\
   !*** ./scripts/utils/getDate.js ***!
@@ -166,8 +201,9 @@ var __webpack_exports__ = {};
   !*** ./scripts/popup.js ***!
   \**************************/
 __webpack_require__.r(__webpack_exports__);
-/* harmony import */ var _utils_getDate__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! ./utils/getDate */ "./scripts/utils/getDate.js");
-/* harmony import */ var _utils_setTextEncode__WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(/*! ./utils/setTextEncode */ "./scripts/utils/setTextEncode.js");
+/* harmony import */ var _fetchers_getUserNickname__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! ./fetchers/getUserNickname */ "./scripts/fetchers/getUserNickname.js");
+/* harmony import */ var _utils_getDate__WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(/*! ./utils/getDate */ "./scripts/utils/getDate.js");
+/* harmony import */ var _utils_setTextEncode__WEBPACK_IMPORTED_MODULE_2__ = __webpack_require__(/*! ./utils/setTextEncode */ "./scripts/utils/setTextEncode.js");
 function _slicedToArray(arr, i) { return _arrayWithHoles(arr) || _iterableToArrayLimit(arr, i) || _unsupportedIterableToArray(arr, i) || _nonIterableRest(); }
 function _nonIterableRest() { throw new TypeError("Invalid attempt to destructure non-iterable instance.\nIn order to be iterable, non-array objects must have a [Symbol.iterator]() method."); }
 function _unsupportedIterableToArray(o, minLen) { if (!o) return; if (typeof o === "string") return _arrayLikeToArray(o, minLen); var n = Object.prototype.toString.call(o).slice(8, -1); if (n === "Object" && o.constructor) n = o.constructor.name; if (n === "Map" || n === "Set") return Array.from(o); if (n === "Arguments" || /^(?:Ui|I)nt(?:8|16|32)(?:Clamped)?Array$/.test(n)) return _arrayLikeToArray(o, minLen); }
@@ -176,17 +212,18 @@ function _iterableToArrayLimit(r, l) { var t = null == r ? null : "undefined" !=
 function _arrayWithHoles(arr) { if (Array.isArray(arr)) return arr; }
 
 
+
 document.addEventListener('DOMContentLoaded', function () {
-  chrome.storage.local.get(['githubToken', 'selectedRepo', 'ownerName', 'savedText'], function (result) {
+  chrome.storage.local.get(['githubToken', 'selectedRepo', 'nickname', 'savedText'], function (result) {
     if (result.githubToken) {
       document.getElementById('extension-login-button').style.display = 'none';
       document.getElementById('extension-logout-button').style.display = 'block';
       document.getElementById('extension-user-section').style.display = 'flex';
-      if (result.ownerName) {
-        showOwnerName(result.ownerName);
+      if (result.nickname) {
+        showOwnerName(result.nickname);
         document.getElementById('extension-user-nickname-p').style.display = 'flex';
         if (result.selectedRepo) {
-          showSelectedRepo(result.selectedRepo, result.ownerName);
+          showSelectedRepo(result.selectedRepo, result.nickname);
           document.getElementById('extension-post-section').style.display = 'flex';
           document.getElementById('extension-user-selectedRepo-p').style.display = 'flex';
           if (result.savedText) {
@@ -240,12 +277,12 @@ document.addEventListener('DOMContentLoaded', function () {
           document.getElementById('extension-logout-button').style.display = 'block';
           fetchRepos(token);
         });
-        fetchOwnerName(token);
+        (0,_fetchers_getUserNickname__WEBPACK_IMPORTED_MODULE_0__.getUserNickname)(token);
       });
     });
   });
   document.getElementById('extension-logout-button').addEventListener('click', function () {
-    chrome.storage.local.remove(['githubToken', 'selectedRepo', 'ownerName', 'savedText'], function () {
+    chrome.storage.local.remove(['githubToken', 'selectedRepo', 'nickname', 'savedText'], function () {
       document.getElementById('extension-login-button').style.display = 'block';
       document.getElementById('extension-logout-button').style.display = 'none';
       document.getElementById('extension-user-section').style.display = 'none';
@@ -276,37 +313,20 @@ document.addEventListener('DOMContentLoaded', function () {
           return;
         }
         var content = document.getElementById('extension-post-textarea').value;
-        var fileName = "".concat((0,_utils_getDate__WEBPACK_IMPORTED_MODULE_0__.getInitialFileName)(), ".md");
-        chrome.storage.local.get('ownerName', function (ownerResult) {
-          var ownerName = ownerResult.ownerName;
-          if (!ownerName) {
+        var fileName = "".concat((0,_utils_getDate__WEBPACK_IMPORTED_MODULE_1__.getInitialFileName)(), ".md");
+        chrome.storage.local.get('nickname', function (ownerResult) {
+          var nickname = ownerResult.nickname;
+          if (!nickname) {
             console.error('No owner name found');
             return;
           }
-          createFileAndCommit(token, repoName, fileName, content, ownerName);
+          createFileAndCommit(token, repoName, fileName, content, nickname);
         });
       });
     });
     chrome.storage.local.remove(['savedText'], function () {});
   });
 });
-function fetchOwnerName(token) {
-  console.log(token);
-  fetch('https://api.github.com/user', {
-    headers: {
-      Authorization: "token ".concat(token)
-    }
-  }).then(function (response) {
-    return response.json();
-  }).then(function (userData) {
-    var ownerName = userData.login;
-    chrome.storage.local.set({
-      ownerName: ownerName
-    }, function () {
-      console.log('Owner name stored:', ownerName);
-    });
-  });
-}
 function fetchRepos(token) {
   fetch('https://api.github.com/user/repos', {
     headers: {
@@ -316,10 +336,11 @@ function fetchRepos(token) {
     return response.json();
   }).then(function (repos) {
     var repoList = document.getElementById('extension-repoList-ul');
-    var ownerName = '';
-    chrome.storage.local.get(['ownerName'], function (result) {
-      if (result.ownerName) ownerName = result.ownerName;
+    var nickname = '';
+    chrome.storage.local.get(['nickname'], function (result) {
+      if (result.nickname) nickname = result.nickname;
     });
+    console.log(nickname);
     repoList.innerHTML = '';
     if (repos.length > 0) {
       repos.forEach(function (repo) {
@@ -330,7 +351,7 @@ function fetchRepos(token) {
           chrome.storage.local.set({
             selectedRepo: repo.name
           }, function () {
-            showSelectedRepo(repo.name, ownerName);
+            showSelectedRepo(repo.name, nickname);
             document.getElementById('extension-post-section').style.display = 'flex';
           });
         });
@@ -342,21 +363,22 @@ function fetchRepos(token) {
     document.getElementById('extension-repoList-section').style.display = 'flex';
   });
 }
-function showSelectedRepo(repoName, ownerName) {
+function showSelectedRepo(repoName, nickname) {
   document.getElementById('extension-repoList-section').style.display = 'none';
   document.getElementById('extension-user-section').style.display = 'flex';
   var selectedRepoSpan = document.getElementById('extension-user-selectedRepo-span');
-  selectedRepoSpan.innerHTML = "<a href=\"https://www.github.com/".concat(ownerName, "/").concat(repoName, "\" target=\"_blank\" class=\"highlighted\">").concat(repoName, "</a>");
+  selectedRepoSpan.innerHTML = "<a href=\"https://www.github.com/".concat(nickname, "/").concat(repoName, "\" target=\"_blank\" class=\"highlighted\">").concat(repoName, "</a>");
 }
-function showOwnerName(ownerName) {
-  var ownerNameSpan = document.getElementById('extension-user-nickname-span');
-  ownerNameSpan.innerHTML = "<a href=\"https://www.github.com/".concat(ownerName, "\" target=\"_blank\" class=\"highlighted\">").concat(ownerName, "</a>");
+function showOwnerName(nickname) {
+  var nicknameSpan = document.getElementById('extension-user-nickname-span');
+  console.log(nickname);
+  nicknameSpan.innerHTML = "<a href=\"https://www.github.com/".concat(nickname, "\" target=\"_blank\" class=\"highlighted\">").concat(nickname, "</a>");
 }
-function createFileAndCommit(token, repoName, fileName, content, ownerName) {
+function createFileAndCommit(token, repoName, fileName, content, nickname) {
   var latestCommitSha; // latestCommitSha 변수를 함수 내에서 선언
 
-  function createFileInFolder(token, repoName, fileName, content, ownerName, folderPath) {
-    fetch("https://api.github.com/repos/".concat(ownerName, "/").concat(repoName, "/contents/").concat(folderPath), {
+  function createFileInFolder(token, repoName, fileName, content, nickname, folderPath) {
+    fetch("https://api.github.com/repos/".concat(nickname, "/").concat(repoName, "/contents/").concat(folderPath), {
       method: 'GET',
       headers: {
         Authorization: "token ".concat(token)
@@ -364,26 +386,26 @@ function createFileAndCommit(token, repoName, fileName, content, ownerName) {
     }).then(function (response) {
       if (response.status === 404) {
         // 폴더가 없으므로 생성
-        return createFolderAndFile(token, repoName, fileName, content, ownerName, folderPath);
+        return createFolderAndFile(token, repoName, fileName, content, nickname, folderPath);
       } else {
         // 폴더가 이미 존재하므로 파일 생성
-        return createNewFile(token, repoName, fileName, content, ownerName, folderPath);
+        return createNewFile(token, repoName, fileName, content, nickname, folderPath);
       }
     })["catch"](function (error) {
       console.error('Error:', error);
     });
   }
-  function createFolderAndFile(token, repoName, fileName, content, ownerName, folderPath) {
+  function createFolderAndFile(token, repoName, fileName, content, nickname, folderPath) {
     var folderName = folderPath.split('/').pop();
     var parentFolder = folderPath.split('/').slice(0, -1).join('/');
     var folderData = {
       path: folderPath,
       message: 'Create new folder',
-      content: (0,_utils_setTextEncode__WEBPACK_IMPORTED_MODULE_1__.encodeBase64)(''),
+      content: (0,_utils_setTextEncode__WEBPACK_IMPORTED_MODULE_2__.encodeBase64)(''),
       // 빈 내용으로 폴더 생성
       branch: 'main' // 변경 필요 시 수정
     };
-    fetch("https://api.github.com/repos/".concat(ownerName, "/").concat(repoName, "/contents/").concat(parentFolder), {
+    fetch("https://api.github.com/repos/".concat(nickname, "/").concat(repoName, "/contents/").concat(parentFolder), {
       method: 'GET',
       headers: {
         Authorization: "token ".concat(token)
@@ -392,7 +414,7 @@ function createFileAndCommit(token, repoName, fileName, content, ownerName) {
       return response.json();
     }).then(function (data) {
       var baseTreeSha = data.sha;
-      return fetch("https://api.github.com/repos/".concat(ownerName, "/").concat(repoName, "/git/trees"), {
+      return fetch("https://api.github.com/repos/".concat(nickname, "/").concat(repoName, "/git/trees"), {
         method: 'POST',
         headers: {
           Authorization: "token ".concat(token),
@@ -413,7 +435,7 @@ function createFileAndCommit(token, repoName, fileName, content, ownerName) {
       return response.json();
     }).then(function (data) {
       var newTreeSha = data.sha;
-      return fetch("https://api.github.com/repos/".concat(ownerName, "/").concat(repoName, "/git/commits"), {
+      return fetch("https://api.github.com/repos/".concat(nickname, "/").concat(repoName, "/git/commits"), {
         method: 'POST',
         headers: {
           Authorization: "token ".concat(token),
@@ -429,7 +451,7 @@ function createFileAndCommit(token, repoName, fileName, content, ownerName) {
       return response.json();
     }).then(function (data) {
       var newCommitSha = data.sha;
-      return fetch("https://api.github.com/repos/".concat(ownerName, "/").concat(repoName, "/git/refs/heads/main"), {
+      return fetch("https://api.github.com/repos/".concat(nickname, "/").concat(repoName, "/git/refs/heads/main"), {
         method: 'PATCH',
         headers: {
           Authorization: "token ".concat(token),
@@ -441,13 +463,13 @@ function createFileAndCommit(token, repoName, fileName, content, ownerName) {
       });
     }).then(function () {
       // 폴더 생성 후 파일 생성
-      return createNewFile(token, repoName, fileName, content, ownerName, folderPath);
+      return createNewFile(token, repoName, fileName, content, nickname, folderPath);
     })["catch"](function (error) {
       console.error('Error:', error);
     });
   }
-  function createNewFile(token, repoName, fileName, content, ownerName, folderPath) {
-    fetch("https://api.github.com/repos/".concat(ownerName, "/").concat(repoName, "/contents/").concat(folderPath, "/").concat(fileName), {
+  function createNewFile(token, repoName, fileName, content, nickname, folderPath) {
+    fetch("https://api.github.com/repos/".concat(nickname, "/").concat(repoName, "/contents/").concat(folderPath, "/").concat(fileName), {
       method: 'GET',
       headers: {
         Authorization: "token ".concat(token)
@@ -455,7 +477,7 @@ function createFileAndCommit(token, repoName, fileName, content, ownerName) {
     }).then(function (response) {
       if (response.status === 404) {
         // 파일이 존재하지 않으므로 생성
-        return fetch("https://api.github.com/repos/".concat(ownerName, "/").concat(repoName, "/contents/").concat(folderPath, "/").concat(fileName), {
+        return fetch("https://api.github.com/repos/".concat(nickname, "/").concat(repoName, "/contents/").concat(folderPath, "/").concat(fileName), {
           method: 'PUT',
           headers: {
             Authorization: "token ".concat(token),
@@ -463,7 +485,7 @@ function createFileAndCommit(token, repoName, fileName, content, ownerName) {
           },
           body: JSON.stringify({
             message: 'Create new Markdown file',
-            content: (0,_utils_setTextEncode__WEBPACK_IMPORTED_MODULE_1__.encodeBase64)(content) // encode content to base64
+            content: (0,_utils_setTextEncode__WEBPACK_IMPORTED_MODULE_2__.encodeBase64)(content) // encode content to base64
           })
         });
       } else {
@@ -472,7 +494,7 @@ function createFileAndCommit(token, repoName, fileName, content, ownerName) {
         if (newFileName) {
           // 사용자가 새 파일 이름을 입력한 경우 파일 생성 함수 재귀 호출
           var myFileName = newFileName + ".md";
-          return createNewFile(token, repoName, myFileName, content, ownerName, folderPath);
+          return createNewFile(token, repoName, myFileName, content, nickname, folderPath);
         } else {
           // 사용자가 입력을 취소한 경우
           throw new Error('파일 이름 입력이 취소되었습니다.');
@@ -492,13 +514,13 @@ function createFileAndCommit(token, repoName, fileName, content, ownerName) {
       console.error('Error:', error);
     });
   }
-  var _getDateInformation = (0,_utils_getDate__WEBPACK_IMPORTED_MODULE_0__.getDateInformation)(),
+  var _getDateInformation = (0,_utils_getDate__WEBPACK_IMPORTED_MODULE_1__.getDateInformation)(),
     _getDateInformation2 = _slicedToArray(_getDateInformation, 3),
     year = _getDateInformation2[0],
     month = _getDateInformation2[1],
     day = _getDateInformation2[2];
   var folderPath = "".concat(year, "/").concat(month);
-  createFileInFolder(token, repoName, fileName, content, ownerName, folderPath);
+  createFileInFolder(token, repoName, fileName, content, nickname, folderPath);
 }
 })();
 
