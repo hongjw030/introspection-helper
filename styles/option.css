@@ -69,8 +69,11 @@
   justify-content: space-between;
 }
 
-.highlighted{
+.text--highlighted{
   color: #00bbaa
+}
+.button--primary{
+   background-color: #00bbaa
  }
 
  /* button, input 스타일 */
