@@ -1,6 +1,9 @@
+import { getNickname } from "./fetchers/getNickname";
+import { getToken } from "./fetchers/getToken";
 import { getUserNickname } from "./fetchers/getUserNickname";
 import { getDateInformation, getInitialFileName } from "./utils/getDate";
 import { encodeBase64 } from "./utils/setTextEncode";
+import { setChooseRepoScreen } from "./visibilities/setChooseRepoScreen";
 
 document.addEventListener('DOMContentLoaded', function() {
   chrome.storage.local.get(['githubToken', 'selectedRepo', 'nickname', 'savedText'], function(result) {
@@ -38,7 +41,7 @@ document.addEventListener('DOMContentLoaded', function() {
     chrome.identity.launchWebAuthFlow({
       url: authUrl,
       interactive: true
-    }, function(redirectUrl) {
+    }, async function(redirectUrl) {
       if (chrome.runtime.lastError) {
         console.error(chrome.runtime.lastError.message);
         return;
@@ -46,28 +49,35 @@ document.addEventListener('DOMContentLoaded', function() {
 
       const params = new URLSearchParams(new URL(redirectUrl).search);
       const code = params.get('code');
-
-      fetch('https://github.com/login/oauth/access_token', {
-        method: 'POST',
-        headers: {
-          'Accept': 'application/json',
-          'Content-Type': 'application/json'
-        },
-        body: JSON.stringify({
-          client_id: 'Ov23liS8uJ1LJSioNTPc',
-          client_secret: '904fcc78be315af16780349f2f74d701aeb3fd34',
-          code: code,
-          redirect_uri: redirectUri
-        })
-      }).then(response => response.json()).then(data => {
-        const token = data.access_token;
-        chrome.storage.local.set({ githubToken: token }, function() {
-          document.getElementById('extension-login-button').style.display = 'none';
-          document.getElementById('extension-logout-button').style.display = 'block';
-          fetchRepos(token);
-        });
-        getUserNickname(token);
+      const token = await getToken(code, redirectUri);
+      chrome.storage.local.set({githubToken: token}, ()=>{
+        setChooseRepoScreen();
+      })
+      const nickname = await getNickname(token);
+      chrome.storage.local.set({nickname: nickname}, (result)=>{
+        console.log(result.nickname)
       });
+      fetchRepos(token);
+
+      // fetch('https://github.com/login/oauth/access_token', {
+      //   method: 'POST',
+      //   headers: {
+      //     'Accept': 'application/json',
+      //     'Content-Type': 'application/json'
+      //   },
+      //   body: JSON.stringify({
+      //     client_id: 'Ov23liS8uJ1LJSioNTPc',
+      //     client_secret: '904fcc78be315af16780349f2f74d701aeb3fd34',
+      //     code: code,
+      //     redirect_uri: redirectUri
+      //   })
+      // }).then(response => response.json()).then(data => {
+      //   const token = data.access_token;
+      //   chrome.storage.local.set({ githubToken: token }, function() {
+      //     document.getElementById('extension-login-button').style.display = 'none';
+      //     document.getElementById('extension-logout-button').style.display = 'block';
+      //   });
+      // });
     });
   });
 
