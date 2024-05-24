@@ -3,7 +3,6 @@
 
 export function setReadyToPostScreen(nickname, repoName){
   document.getElementById('extension-login-button').style.display = 'none';
-  
   document.getElementById('extension-repoList-section').style.display = 'none';
 
   document.getElementById('extension-logout-button').style.display = 'flex';

@@ -1,6 +1,7 @@
 import { getNickname } from "./fetchers/getNickname";
 import { getRepoList } from "./fetchers/getRepoList";
 import { getToken } from "./fetchers/getToken";
+import { revokeToken } from "./fetchers/revokeToken";
 import { getDateInformation } from "./utils/getDate";
 import { encodeBase64 } from "./utils/setTextEncode";
 import { setChooseRepoScreen } from "./visibilities/setChooseRepoScreen";
@@ -10,6 +11,9 @@ import { setRepoListScreen } from "./visibilities/setRepoListScreen";
 
 const [YEAR, MONTH, DAY] = getDateInformation();
 const SUBMISSION_DATE = `${YEAR}${MONTH}${DAY}`;
+
+const CLIENT_ID = 'Ov23liS8uJ1LJSioNTPc';
+const CLIENT_SECRET = '904fcc78be315af16780349f2f74d701aeb3fd34';
 
 document.addEventListener('DOMContentLoaded', function() {
   chrome.storage.local.get(['githubToken', 'selectedRepo', 'nickname', 'savedText', 'savedTemplate', 'habit', 'submissionDate'], async function(result) {
@@ -35,9 +39,11 @@ document.addEventListener('DOMContentLoaded', function() {
           const prevDate = result.submissionDate;
           if (prevDate !== SUBMISSION_DATE){
             // 오늘 제출 안했다면?
+            habitSection.setAttribute('data-isChecked', 'false')
             habitSection.textContent = `${YEAR}년 ${MONTH}월 ${DAY}일 회고를 작성하지 않았어요! 😐`;
           }else{
             // 오늘 제출했다면?
+            habitSection.setAttribute('data-isChecked', 'true')
             habitSection.textContent = `${YEAR}년 ${MONTH}월 ${DAY}일 회고를 작성했어요! 💯`;
           }
         }else{
@@ -46,9 +52,10 @@ document.addEventListener('DOMContentLoaded', function() {
         
       } else {
         // 레포 선택안한 채로 창을 끄면 재로그인해야 함.
-        chrome.storage.local.remove(['githubToken', 'selectedRepo', 'nickname', 'savedText'], ()=> {
-          setLogoutScreen();
-        });
+        let deleteToken = result.githubToken;
+        revokeToken(CLIENT_ID, CLIENT_SECRET, deleteToken);
+        chrome.storage.local.clear();
+        setLogoutScreen();
       }
     } else {
       // github 토큰이 없다면 로그인이 안된 상태이므로 LogoutScreen 상태 보여짐.
@@ -59,7 +66,7 @@ document.addEventListener('DOMContentLoaded', function() {
   // 로그인 버튼 기능
   document.getElementById('extension-login-button').addEventListener('click', function() {
     const redirectUri = chrome.identity.getRedirectURL();
-    const authUrl = `https://github.com/login/oauth/authorize?client_id=Ov23liS8uJ1LJSioNTPc&redirect_uri=${encodeURIComponent(redirectUri)}&scope=repo`;
+    const authUrl = `https://github.com/login/oauth/authorize?client_id=${CLIENT_ID}&redirect_uri=${encodeURIComponent(redirectUri)}&scope=repo`;
 
     chrome.identity.launchWebAuthFlow({
       url: authUrl,
@@ -89,9 +96,12 @@ document.addEventListener('DOMContentLoaded', function() {
 
   // 로그아웃 버튼 기능
   document.getElementById('extension-logout-button').addEventListener('click', function() {
-    chrome.storage.local.remove(['githubToken', 'selectedRepo', 'nickname', 'savedText', 'savedTemplate', 'habit', 'submissionDate'], ()=> {
+    let deleteToken = chrome.storage.local.get('githubToken');
+    let isRevoked = revokeToken(CLIENT_ID, CLIENT_SECRET, deleteToken);
+    if (isRevoked){
+      chrome.storage.local.clear();
       setLogoutScreen();
-    });
+    }else return;
   });
 
 // 임시저장 버튼 기능
@@ -264,8 +274,11 @@ function createFileAndCommit(token, repoName, fileName, content, nickname) {
     .then(response => {
       if (response.status === 201) {
         chrome.storage.local.set({'submissionDate': SUBMISSION_DATE})
-        const habitSection = document.getElementById('extension-optional-habit-article');
-        habitSection.textContent = `${YEAR}년 ${MONTH}월 ${DAY}일 회고를 작성했어요! 💯`;
+        if(chrome.storage.local.get('habit')){
+          const habitSection = document.getElementById('extension-optional-habit-article');
+          habitSection.setAttribute("data-isChecked", 'true')
+          habitSection.textContent = `${YEAR}년 ${MONTH}월 ${DAY}일 회고를 작성했어요! 💯`;
+        }
 
         alert(`파일 ${fileName}이(가) 생성되었습니다.`);
         const resetText = chrome.storage.local.get('savedTemplate') ?? "";
