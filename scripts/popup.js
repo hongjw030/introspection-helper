@@ -1,7 +1,7 @@
 import { getNickname } from "./fetchers/getNickname";
 import { getRepoList } from "./fetchers/getRepoList";
 import { getToken } from "./fetchers/getToken";
-import { getDateInformation, getInitialFileName } from "./utils/getDate";
+import { getDateInformation } from "./utils/getDate";
 import { encodeBase64 } from "./utils/setTextEncode";
 import { setChooseRepoScreen } from "./visibilities/setChooseRepoScreen";
 import { setLogoutScreen } from "./visibilities/setLogoutScreen";
@@ -9,6 +9,9 @@ import { setNicknameScreen } from "./visibilities/setNicknameScreen";
 import { setReadyToPostScreen } from "./visibilities/setReadyToPostScreen";
 import { setRepoListScreen } from "./visibilities/setRepoListScreen";
 import { setSelectedRepoScreen } from "./visibilities/setSelectedRepoScreen";
+
+const [YEAR, MONTH, DAY] = getDateInformation();
+const SUBMISSION_DATE = `${YEAR}${MONTH}${DAY}`;
 
 document.addEventListener('DOMContentLoaded', function() {
   chrome.storage.local.get(['githubToken', 'selectedRepo', 'nickname', 'savedText', 'savedTemplate', 'habit', 'submissionDate'], async function(result) {
@@ -34,13 +37,12 @@ document.addEventListener('DOMContentLoaded', function() {
           // 오늘 회고 작성했는지 여부 볼 수 있음.
           habitSection.style.display='flex';
           const prevDate = result.submissionDate;
-          const [year, month, day] = getDateInformation();
-          if (prevDate !== `${year}${month}${day}`){
+          if (prevDate !== `${YEAR}${MONTH}${DAY}`){
             // 오늘 제출 안했다면?
-            habitSection.textContent = `${year}년 ${month}월 ${day}일 회고를 작성하지 않았어요! 😐`;
+            habitSection.textContent = `${YEAR}년 ${MONTH}월 ${DAY}일 회고를 작성하지 않았어요! 😐`;
           }else{
             // 오늘 제출했다면?
-            habitSection.textContent = `${year}년 ${month}월 ${day}일 회고를 작성했어요! 💯`;
+            habitSection.textContent = `${YEAR}년 ${MONTH}월 ${DAY}일 회고를 작성했어요! 💯`;
           }
         }else{
           habitSection.style.display='none';
@@ -106,20 +108,12 @@ document.addEventListener('DOMContentLoaded', function() {
   document.getElementById('extension-submit-button').addEventListener('click', function() {
     chrome.storage.local.get('githubToken', function(result) {
       const token = result.githubToken;
-      if (!token) {
-        console.error('GitHub token not found');
-        return;
-      }
 
       chrome.storage.local.get('selectedRepo', function(repoResult) {
         const repoName = repoResult.selectedRepo;
-        if (!repoName) {
-          console.error('Selected repository not found');
-          return;
-        }
         const content = document.getElementById('extension-post-textarea').value;
 
-        const fileName = `${getInitialFileName()}.md`;
+        const fileName = `${SUBMISSION_DATE}.md`;
         chrome.storage.local.get('nickname', function(ownerResult){
           const nickname = ownerResult.nickname;
           if (!nickname){
@@ -272,13 +266,13 @@ function createFileAndCommit(token, repoName, fileName, content, nickname) {
     })
     .then(response => {
       if (response.status === 201) {
-        const submissionDate = getInitialFileName();
-        chrome.storage.local.set({'submissionDate': submissionDate})
+        chrome.storage.local.set({'submissionDate': SUBMISSION_DATE})
         const habitSection = document.getElementById('extension-optional-habit-article');
-        habitSection.textContent = `${year}년 ${month}월 ${day}일 회고를 작성했어요! 💯`;
+        habitSection.textContent = `${YEAR}년 ${MONTH}월 ${DAY}일 회고를 작성했어요! 💯`;
 
         alert(`파일 ${fileName}이(가) 생성되었습니다.`);
-        document.getElementById('extension-post-textarea').value = '';
+        const resetText = chrome.storage.local.get('savedTemplate') ?? "";
+        document.getElementById('extension-post-textarea').value = resetText;
       } else {
         throw new Error('Failed to create file');
       }
@@ -290,8 +284,7 @@ function createFileAndCommit(token, repoName, fileName, content, nickname) {
       console.error('Error:', error);
     });
   }
-  const [year, month, day] = getDateInformation();
-  const folderPath = `${year}/${month}`;
+  const folderPath = `${YEAR}/${MONTH}`;
 
   createFileInFolder(token, repoName, fileName, content, nickname, folderPath);
 }

@@ -1,4 +1,4 @@
-import { getDateInformation, getInitialFileName } from '../../scripts/utils/getDate';
+import { getDateInformation } from '../../scripts/utils/getDate';
 
 describe('날짜 함수', () => {
   beforeAll(() => {
@@ -19,8 +19,4 @@ describe('날짜 함수', () => {
     expect(day).toBe('23');
   });
 
-  test('getInitialFileName 함수가 현재 날짜에 따른 파일 이름 문자열을 리턴하는가?', () => {
-    const fileName = getInitialFileName();
-    expect(fileName).toBe('20240523');
-  });
 });
