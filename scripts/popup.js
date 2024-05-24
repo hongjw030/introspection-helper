@@ -136,7 +136,7 @@ document.addEventListener('DOMContentLoaded', function() {
 });
 
 function createFileAndCommit(token, repoName, fileName, content, nickname) {
-  let latestCommitSha; // latestCommitSha 변수를 함수 내에서 선언
+  let latestCommitSha; 
 
   function createFileInFolder(token, repoName, fileName, content, nickname, folderPath) {
     fetch(`https://api.github.com/repos/${nickname}/${repoName}/contents/${folderPath}`, {
@@ -271,7 +271,7 @@ function createFileAndCommit(token, repoName, fileName, content, nickname) {
         }
       }
     })
-    .then(response => {
+    .then(async response => {
       if (response.status === 201) {
         chrome.storage.local.set({'submissionDate': SUBMISSION_DATE})
         if(chrome.storage.local.get('habit')){
@@ -279,10 +279,10 @@ function createFileAndCommit(token, repoName, fileName, content, nickname) {
           habitSection.setAttribute("data-isChecked", 'true')
           habitSection.textContent = `${YEAR}년 ${MONTH}월 ${DAY}일 회고를 작성했어요! 💯`;
         }
-
-        alert(`파일 ${fileName}이(가) 생성되었습니다.`);
-        const resetText = chrome.storage.local.get('savedTemplate') ?? "";
-        document.getElementById('extension-post-textarea').value = resetText;
+        chrome.storage.local.get('savedTemplate', (result)=>{
+          document.getElementById('extension-post-textarea').value = result.savedTemplate ?? "";
+          alert(`파일 ${fileName}이(가) 생성되었습니다.`);
+        })
       } else {
         throw new Error('Failed to create file');
       }
