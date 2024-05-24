@@ -73,7 +73,6 @@ document.addEventListener('DOMContentLoaded', function() {
       interactive: true
     }, async function(redirectUrl) {
       if (chrome.runtime.lastError) {
-        console.error(chrome.runtime.lastError.message);
         return;
       }
 
@@ -124,7 +123,6 @@ document.addEventListener('DOMContentLoaded', function() {
         chrome.storage.local.get('nickname', function(ownerResult){
           const nickname = ownerResult.nickname;
           if (!nickname){
-            console.error('No owner name found');
             return;
           }
           createFileAndCommit(token, repoName, fileName, content, nickname);
@@ -155,7 +153,6 @@ function createFileAndCommit(token, repoName, fileName, content, nickname) {
       }
     })
     .catch(error => {
-      console.error('Error:', error);
     });
   }
 
@@ -233,7 +230,6 @@ function createFileAndCommit(token, repoName, fileName, content, nickname) {
       return createNewFile(token, repoName, fileName, content, nickname, folderPath);
     })
     .catch(error => {
-      console.error('Error:', error);
     });
   }
 
@@ -291,7 +287,6 @@ function createFileAndCommit(token, repoName, fileName, content, nickname) {
       if (error.message === 'Failed to create file'){
         alert("Error: 커밋에 실패했습니다.");
       }
-      console.error('Error:', error);
     });
   }
   const folderPath = `${YEAR}/${MONTH}`;

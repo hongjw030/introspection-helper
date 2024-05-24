@@ -18,6 +18,6 @@ export async function getToken(code, redirectUri){
     const token = data.access_token;
     return token;
   }catch(error){
-    console.error('Error fetching token: ', error);
+    return;
   }
 }
