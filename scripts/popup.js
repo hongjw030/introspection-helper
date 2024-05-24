@@ -1,24 +1,27 @@
 import { getNickname } from "./fetchers/getNickname";
 import { getRepoList } from "./fetchers/getRepoList";
 import { getToken } from "./fetchers/getToken";
-import { getDateInformation, getInitialFileName } from "./utils/getDate";
+import { revokeToken } from "./fetchers/revokeToken";
+import { getDateInformation } from "./utils/getDate";
 import { encodeBase64 } from "./utils/setTextEncode";
 import { setChooseRepoScreen } from "./visibilities/setChooseRepoScreen";
 import { setLogoutScreen } from "./visibilities/setLogoutScreen";
-import { setNicknameScreen } from "./visibilities/setNicknameScreen";
 import { setReadyToPostScreen } from "./visibilities/setReadyToPostScreen";
 import { setRepoListScreen } from "./visibilities/setRepoListScreen";
-import { setSelectedRepoScreen } from "./visibilities/setSelectedRepoScreen";
+
+const [YEAR, MONTH, DAY] = getDateInformation();
+const SUBMISSION_DATE = `${YEAR}${MONTH}${DAY}`;
+
+const CLIENT_ID = 'Ov23liS8uJ1LJSioNTPc';
+const CLIENT_SECRET = '904fcc78be315af16780349f2f74d701aeb3fd34';
 
 document.addEventListener('DOMContentLoaded', function() {
   chrome.storage.local.get(['githubToken', 'selectedRepo', 'nickname', 'savedText', 'savedTemplate', 'habit', 'submissionDate'], async function(result) {
-    // 깃헙 토큰이 있다면 로그인된 상태.
     if (result.githubToken) {
-      // 이미 레포를 선택했었다면
+      // 깃헙 토큰이 있다면 로그인된 상태.
       if (result.selectedRepo) {
+        // 이미 레포를 선택했었다면 ReadyToPost 화면을 보여줌.
         setReadyToPostScreen(result.nickname, result.selectedRepo);
-        setNicknameScreen(result.nickname);
-        setSelectedRepoScreen(result.selectedRepo, result.nickname);
 
         const textarea = document.getElementById('extension-post-textarea');
         if (result.savedText){
@@ -34,22 +37,24 @@ document.addEventListener('DOMContentLoaded', function() {
           // 오늘 회고 작성했는지 여부 볼 수 있음.
           habitSection.style.display='flex';
           const prevDate = result.submissionDate;
-          const [year, month, day] = getDateInformation();
-          if (prevDate !== `${year}${month}${day}`){
+          if (prevDate !== SUBMISSION_DATE){
             // 오늘 제출 안했다면?
-            habitSection.textContent = `${year}년 ${month}월 ${day}일 회고를 작성하지 않았어요! 😐`;
+            habitSection.setAttribute('data-isChecked', 'false')
+            habitSection.textContent = `${YEAR}년 ${MONTH}월 ${DAY}일 회고를 작성하지 않았어요! 😐`;
           }else{
             // 오늘 제출했다면?
-            habitSection.textContent = `${year}년 ${month}월 ${day}일 회고를 작성했어요! 💯`;
+            habitSection.setAttribute('data-isChecked', 'true')
+            habitSection.textContent = `${YEAR}년 ${MONTH}월 ${DAY}일 회고를 작성했어요! 💯`;
           }
         }else{
           habitSection.style.display='none';
         }
       } else {
         // 레포 선택안한 채로 창을 끄면 재로그인해야 함.
-        chrome.storage.local.remove(['githubToken', 'selectedRepo', 'nickname', 'savedText'], ()=> {
-          setLogoutScreen();
-        });
+        let deleteToken = result.githubToken;
+        revokeToken(CLIENT_ID, CLIENT_SECRET, deleteToken);
+        chrome.storage.local.clear();
+        setLogoutScreen();
       }
     } else {
       // github 토큰이 없다면 로그인이 안된 상태이므로 LogoutScreen 상태 보여짐.
@@ -60,14 +65,13 @@ document.addEventListener('DOMContentLoaded', function() {
   // 로그인 버튼 기능
   document.getElementById('extension-login-button').addEventListener('click', function() {
     const redirectUri = chrome.identity.getRedirectURL();
-    const authUrl = `https://github.com/login/oauth/authorize?client_id=Ov23liS8uJ1LJSioNTPc&redirect_uri=${encodeURIComponent(redirectUri)}&scope=repo`;
+    const authUrl = `https://github.com/login/oauth/authorize?client_id=${CLIENT_ID}&redirect_uri=${encodeURIComponent(redirectUri)}&scope=repo`;
 
     chrome.identity.launchWebAuthFlow({
       url: authUrl,
       interactive: true
     }, async function(redirectUrl) {
       if (chrome.runtime.lastError) {
-        console.error(chrome.runtime.lastError.message);
         return;
       }
 
@@ -90,9 +94,12 @@ document.addEventListener('DOMContentLoaded', function() {
 
   // 로그아웃 버튼 기능
   document.getElementById('extension-logout-button').addEventListener('click', function() {
-    chrome.storage.local.remove(['githubToken', 'selectedRepo', 'nickname', 'savedText', 'savedTemplate', 'habit', 'submissionDate'], ()=> {
+    let deleteToken = chrome.storage.local.get('githubToken');
+    let isRevoked = revokeToken(CLIENT_ID, CLIENT_SECRET, deleteToken);
+    if (isRevoked){
+      chrome.storage.local.clear();
       setLogoutScreen();
-    });
+    }else return;
   });
 
 // 임시저장 버튼 기능
@@ -106,24 +113,15 @@ document.addEventListener('DOMContentLoaded', function() {
   document.getElementById('extension-submit-button').addEventListener('click', function() {
     chrome.storage.local.get('githubToken', function(result) {
       const token = result.githubToken;
-      if (!token) {
-        console.error('GitHub token not found');
-        return;
-      }
 
       chrome.storage.local.get('selectedRepo', function(repoResult) {
         const repoName = repoResult.selectedRepo;
-        if (!repoName) {
-          console.error('Selected repository not found');
-          return;
-        }
         const content = document.getElementById('extension-post-textarea').value;
 
-        const fileName = `${getInitialFileName()}.md`;
+        const fileName = `${SUBMISSION_DATE}.md`;
         chrome.storage.local.get('nickname', function(ownerResult){
           const nickname = ownerResult.nickname;
           if (!nickname){
-            console.error('No owner name found');
             return;
           }
           createFileAndCommit(token, repoName, fileName, content, nickname);
@@ -135,7 +133,6 @@ document.addEventListener('DOMContentLoaded', function() {
 });
 
 function createFileAndCommit(token, repoName, fileName, content, nickname) {
-  let latestCommitSha; // latestCommitSha 변수를 함수 내에서 선언
 
   function createFileInFolder(token, repoName, fileName, content, nickname, folderPath) {
     fetch(`https://api.github.com/repos/${nickname}/${repoName}/contents/${folderPath}`, {
@@ -154,19 +151,12 @@ function createFileAndCommit(token, repoName, fileName, content, nickname) {
       }
     })
     .catch(error => {
-      console.error('Error:', error);
     });
   }
 
   function createFolderAndFile(token, repoName, fileName, content, nickname, folderPath) {
     const folderName = folderPath.split('/').pop();
     const parentFolder = folderPath.split('/').slice(0, -1).join('/');
-    const folderData = {
-      path: folderPath,
-      message: 'Create new folder',
-      content: encodeBase64(''), // 빈 내용으로 폴더 생성
-      branch: 'main' // 변경 필요 시 수정
-    };
 
     fetch(`https://api.github.com/repos/${nickname}/${repoName}/contents/${parentFolder}`, {
       method: 'GET',
@@ -232,7 +222,7 @@ function createFileAndCommit(token, repoName, fileName, content, nickname) {
       return createNewFile(token, repoName, fileName, content, nickname, folderPath);
     })
     .catch(error => {
-      console.error('Error:', error);
+      return;
     });
   }
 
@@ -270,15 +260,18 @@ function createFileAndCommit(token, repoName, fileName, content, nickname) {
         }
       }
     })
-    .then(response => {
+    .then(async response => {
       if (response.status === 201) {
-        const submissionDate = getInitialFileName();
-        chrome.storage.local.set({'submissionDate': submissionDate})
-        const habitSection = document.getElementById('extension-optional-habit-article');
-        habitSection.textContent = `${year}년 ${month}월 ${day}일 회고를 작성했어요! 💯`;
-
-        alert(`파일 ${fileName}이(가) 생성되었습니다.`);
-        document.getElementById('extension-post-textarea').value = '';
+        chrome.storage.local.set({'submissionDate': SUBMISSION_DATE})
+        if(chrome.storage.local.get('habit')){
+          const habitSection = document.getElementById('extension-optional-habit-article');
+          habitSection.setAttribute("data-isChecked", 'true')
+          habitSection.textContent = `${YEAR}년 ${MONTH}월 ${DAY}일 회고를 작성했어요! 💯`;
+        }
+        chrome.storage.local.get('savedTemplate', (result)=>{
+          document.getElementById('extension-post-textarea').value = result.savedTemplate ?? "";
+          alert(`파일 ${fileName}이(가) 생성되었습니다.`);
+        })
       } else {
         throw new Error('Failed to create file');
       }
@@ -287,11 +280,9 @@ function createFileAndCommit(token, repoName, fileName, content, nickname) {
       if (error.message === 'Failed to create file'){
         alert("Error: 커밋에 실패했습니다.");
       }
-      console.error('Error:', error);
     });
   }
-  const [year, month, day] = getDateInformation();
-  const folderPath = `${year}/${month}`;
+  const folderPath = `${YEAR}/${MONTH}`;
 
   createFileInFolder(token, repoName, fileName, content, nickname, folderPath);
 }

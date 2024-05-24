@@ -1,12 +1,12 @@
 {
   "manifest_version": 3,
   "name": "Introspection Helper",
-  "version": "1.0",
+  "version": "1.0.0",
   "description": "input에 회고를 작성하면, 마크다운 파일로 만들어 깃허브 레파지토리에 커밋해줍니다.",
   "author": "hongjw030",
   "permissions": [
     "identity",
-    "activeTab",
+    "activeTap",
     "scripting",
     "storage",
     "unlimitedStorage",
@@ -22,7 +22,7 @@
     "512": "assets/icons/signature512.png"
   },
   "background": {
-    "service_worker": "scripts/background.js"
+    "service_worker": "dist/background.js"
   },
   "action": {
     "default_icon": "assets/icons/signature32.png",
@@ -33,7 +33,7 @@
     {
       "matches": ["<all_urls>"],
       "css": ["styles/popup.css"],
-      "js": ["dist/bundle.js"]
+      "js": ["dist/option.bundle.js", "dist/popup.bundle.js"]
     }
   ],
   "oauth2": {

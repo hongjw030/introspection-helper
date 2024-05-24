@@ -8,6 +8,6 @@ export async function getRepoList(token) {
     const reposData = await response.json();
     return reposData;
   }catch(error){
-    console.error('Error fetching repoList: ', error);
+    return;
   }
 }

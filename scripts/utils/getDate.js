@@ -13,16 +13,3 @@ export function getDateInformation() {
   let day = today.getDate().toString().padStart(2, '0');
   return [year, month, day];
 }
-
-/*
- * 파일 이름 리턴 함수
- * 
- * desc: introspection.md 파일의 이름을 오늘 날짜에 맞춰 생성하는 함수
- * params: 
- * returns: `{year}{month}{day}`
- * test: 
- */
-export function getInitialFileName(){
-  const [year, month, day] = getDateInformation();
-  return `${year}${month}${day}`;
-}

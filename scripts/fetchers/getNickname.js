@@ -17,7 +17,6 @@ export async function getNickname(token) {
     const nickname = userData.login;
     return nickname;
   }catch(error){
-    console.error('error in fetching user data: ', error);
     return;
   }
 }

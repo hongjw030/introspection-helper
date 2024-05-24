@@ -5,7 +5,7 @@
   <meta charset="UTF-8" />
   <meta http-equiv="x-ua-compatible" content="IE=edge" />
   <link rel="stylesheet" href="./styles/popup.css">
-  <script type="module" src="./dist/bundle.js"></script>
+  <script type="module" src="./dist/popup.bundle.js"></script>
   <!-- <script type="module" src="./scripts/popup.js"></script> -->
 </head>
 
@@ -17,7 +17,6 @@
     </header>
     
     <button id="extension-login-button" class="button button--login button--primary" style="display:none;">GitHub Login</button>
-    <button id="extension-logout-button" class="button button--logout button--warning" style="display:none;">GitHub Logout</button>
     
     <section id="extension-repoList-section" class="section section--repoList" style="display:none;">
       <h2 class="section__title">Choose repository!</h2>
@@ -25,41 +24,38 @@
     </section>
   
     <section id="extension-user-section" class="section section--user" style="display:none;">
-      <p id="extension-user-nickname-p" class="p section__p section__p--user--nickname">
-        <span class="p__span">Owner Nickname is : </span>
-        <span id="extension-user-nickname-span" class="p__span text--highlighted"></span>
-      </p>
       <p id="extension-user-selectedRepo-p" class="p section__p section__p--user--selectedRepo">
-        <span class="p__span">Selected Repo is : </span>
+        <span class="p__span">Selected Repo : </span>
         <span id="extension-user-selectedRepo-span" class="p__span text--highlighted"></span>
       </p>
     </section>
     
     <section id="extension-post-section" class="section section--post" style="display:none;">
-      <h2 class="section__title">Write Your Introspection!</h2>
-      <p id="extension-optional-p" class="p section__p section__p--optional" style="display:none;">
-        <article id="extension-optional-habit-article" class="article p__article p__article--habit"></article>
-      </p>
-      <a id="extension-option-a" class="a a--option" href="option.html">go to option -></a>
+      <a id="extension-option-a" class="a a--option" href="option.html">more options</a>
+
+      <article id="extension-optional-habit-article" class="article p__article p__article--habit" style="display: none;" data-isChecked="false"></article>
+
       <textarea id="extension-post-textarea" class="textarea section__textarea section__textarea--post" placeholder="type your introspection!"></textarea>
     
       <div class="div--buttonList">
         <button id="extension-save-button" class="button button--save button--secondary">save</button>
         <button id="extension-submit-button" class="button button--submit button--primary">Submit</button>
       </div>
-      
     </section>
   
     <footer class="footer">
-      <article class="footer__article--link">
-        <a href="chrome-extension://nkmemnehekmfeekceceegmaobidfpghm/welcome.html" target="_blank">homepage</a>
-      </article>
-      <article class="footer__article--link">
-        <a href="mailto:hongjw030@naver.com">mail to</a>
-      </article>
-      <article class="footer__article--link">
-        <a href="https://github.com/hongjw030/introspection-helper" target="_blank">repository</a>
-      </article>
+      <div class="footer__div">
+        <article class="footer__article--link">
+          <a href="chrome-extension://nkmemnehekmfeekceceegmaobidfpghm/welcome.html" target="_blank" class="footer__a"><img src="assets/home.svg" width="20px" height="20px"/> Homepage</a>
+        </article>
+        <article class="footer__article--link">
+          <a href="mailto:hongjw030@naver.com" class="footer__a"><img src="assets/mail.svg" width="20px" height="20px"/> Mail to</a>
+        </article>
+        <article class="footer__article--link">
+          <a href="https://github.com/hongjw030/introspection-helper" target="_blank" class="footer__a"><img src="assets/github.svg" width="20px" height="20px"/> Repository</a>
+        </article>
+      </div>
+        <button id="extension-logout-button" class="button button--logout button--warning" style="display:none;">Logout</button>
     </footer>
 </main>
 
