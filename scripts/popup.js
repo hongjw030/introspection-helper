@@ -5,23 +5,19 @@ import { getDateInformation } from "./utils/getDate";
 import { encodeBase64 } from "./utils/setTextEncode";
 import { setChooseRepoScreen } from "./visibilities/setChooseRepoScreen";
 import { setLogoutScreen } from "./visibilities/setLogoutScreen";
-import { setNicknameScreen } from "./visibilities/setNicknameScreen";
 import { setReadyToPostScreen } from "./visibilities/setReadyToPostScreen";
 import { setRepoListScreen } from "./visibilities/setRepoListScreen";
-import { setSelectedRepoScreen } from "./visibilities/setSelectedRepoScreen";
 
 const [YEAR, MONTH, DAY] = getDateInformation();
 const SUBMISSION_DATE = `${YEAR}${MONTH}${DAY}`;
 
 document.addEventListener('DOMContentLoaded', function() {
   chrome.storage.local.get(['githubToken', 'selectedRepo', 'nickname', 'savedText', 'savedTemplate', 'habit', 'submissionDate'], async function(result) {
-    // 깃헙 토큰이 있다면 로그인된 상태.
     if (result.githubToken) {
-      // 이미 레포를 선택했었다면
+      // 깃헙 토큰이 있다면 로그인된 상태.
       if (result.selectedRepo) {
+        // 이미 레포를 선택했었다면 ReadyToPost 화면을 보여줌.
         setReadyToPostScreen(result.nickname, result.selectedRepo);
-        setNicknameScreen(result.nickname);
-        setSelectedRepoScreen(result.selectedRepo, result.nickname);
 
         const textarea = document.getElementById('extension-post-textarea');
         if (result.savedText){
@@ -37,7 +33,7 @@ document.addEventListener('DOMContentLoaded', function() {
           // 오늘 회고 작성했는지 여부 볼 수 있음.
           habitSection.style.display='flex';
           const prevDate = result.submissionDate;
-          if (prevDate !== `${YEAR}${MONTH}${DAY}`){
+          if (prevDate !== SUBMISSION_DATE){
             // 오늘 제출 안했다면?
             habitSection.textContent = `${YEAR}년 ${MONTH}월 ${DAY}일 회고를 작성하지 않았어요! 😐`;
           }else{
@@ -47,6 +43,7 @@ document.addEventListener('DOMContentLoaded', function() {
         }else{
           habitSection.style.display='none';
         }
+        
       } else {
         // 레포 선택안한 채로 창을 끄면 재로그인해야 함.
         chrome.storage.local.remove(['githubToken', 'selectedRepo', 'nickname', 'savedText'], ()=> {
