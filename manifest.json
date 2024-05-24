@@ -5,6 +5,8 @@
   "description": "input에 회고를 작성하면, 마크다운 파일로 만들어 깃허브 레파지토리에 커밋해줍니다.",
   "author": "hongjw030",
   "permissions": [
+    "identity",
+    "activeTap",
     "scripting",
     "storage",
     "unlimitedStorage",
@@ -20,7 +22,7 @@
     "512": "assets/icons/signature512.png"
   },
   "background": {
-    "service_worker": "scripts/background.js"
+    "service_worker": "dist/background.js"
   },
   "action": {
     "default_icon": "assets/icons/signature32.png",
