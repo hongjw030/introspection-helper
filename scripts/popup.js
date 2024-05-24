@@ -49,7 +49,6 @@ document.addEventListener('DOMContentLoaded', function() {
         }else{
           habitSection.style.display='none';
         }
-        
       } else {
         // 레포 선택안한 채로 창을 끄면 재로그인해야 함.
         let deleteToken = result.githubToken;
@@ -134,7 +133,6 @@ document.addEventListener('DOMContentLoaded', function() {
 });
 
 function createFileAndCommit(token, repoName, fileName, content, nickname) {
-  let latestCommitSha; 
 
   function createFileInFolder(token, repoName, fileName, content, nickname, folderPath) {
     fetch(`https://api.github.com/repos/${nickname}/${repoName}/contents/${folderPath}`, {
@@ -159,12 +157,6 @@ function createFileAndCommit(token, repoName, fileName, content, nickname) {
   function createFolderAndFile(token, repoName, fileName, content, nickname, folderPath) {
     const folderName = folderPath.split('/').pop();
     const parentFolder = folderPath.split('/').slice(0, -1).join('/');
-    const folderData = {
-      path: folderPath,
-      message: 'Create new folder',
-      content: encodeBase64(''), // 빈 내용으로 폴더 생성
-      branch: 'main' // 변경 필요 시 수정
-    };
 
     fetch(`https://api.github.com/repos/${nickname}/${repoName}/contents/${parentFolder}`, {
       method: 'GET',
@@ -230,6 +222,7 @@ function createFileAndCommit(token, repoName, fileName, content, nickname) {
       return createNewFile(token, repoName, fileName, content, nickname, folderPath);
     })
     .catch(error => {
+      return;
     });
   }
 
