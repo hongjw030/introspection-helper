@@ -2,8 +2,10 @@ import { getNickname } from "./fetchers/getNickname";
 import { getRepoList } from "./fetchers/getRepoList";
 import { getToken } from "./fetchers/getToken";
 import { revokeToken } from "./fetchers/revokeToken";
+
 import { getDateInformation } from "./utils/getDate";
 import { encodeBase64 } from "./utils/setTextEncode";
+
 import { setChooseRepoScreen } from "./visibilities/setChooseRepoScreen";
 import { setLogoutScreen } from "./visibilities/setLogoutScreen";
 import { setReadyToPostScreen } from "./visibilities/setReadyToPostScreen";

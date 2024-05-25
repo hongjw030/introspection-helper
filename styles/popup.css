@@ -108,7 +108,6 @@
   height: 200px;
   border-radius: 8px;
   border: 1px solid #aaaaaa;
-  margin-top: 20px;
 }
 
 .div--buttonList{
@@ -129,9 +128,17 @@
 [data-isChecked=true]{
   color:#00bbaa;
 }
-.button--logout{
+.a--logout{
   width: 80px;
   font-size: 0.8rem;
+  position: absolute;
+  top: 5px;
+  left: 30px;
+  background-color: transparent;
+  cursor: pointer;
+  color: #fa4D79;
+  border: none;
+  text-decoration: underline;
 }
 
 .a--option, .a--popup{

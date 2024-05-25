@@ -32,15 +32,18 @@
     
     <section id="extension-post-section" class="section section--post" style="display:none;">
       <a id="extension-option-a" class="a a--option" href="option.html">more options</a>
+      <button id="extension-logout-button" arial-role="logout" class="a a--logout" style="display:none;">Logout</button>
 
       <article id="extension-optional-habit-article" class="article p__article p__article--habit" style="display: none;" data-isChecked="false"></article>
 
-      <textarea id="extension-post-textarea" class="textarea section__textarea section__textarea--post" placeholder="type your introspection!"></textarea>
-    
       <div class="div--buttonList">
         <button id="extension-save-button" class="button button--save button--secondary">save</button>
-        <button id="extension-submit-button" class="button button--submit button--primary">Submit</button>
+        <button id="extension-reset-button" class="button button--reset button--warning">reset</button>
       </div>
+
+      <textarea id="extension-post-textarea" class="textarea section__textarea section__textarea--post" placeholder="type your introspection!"></textarea>
+
+      <button id="extension-submit-button" class="button button--submit button--primary">Submit</button>
     </section>
   
     <footer class="footer">
@@ -55,7 +58,6 @@
           <a href="https://github.com/hongjw030/introspection-helper" target="_blank" class="footer__a"><img src="assets/github.svg" width="20px" height="20px"/> Repository</a>
         </article>
       </div>
-        <button id="extension-logout-button" class="button button--logout button--warning" style="display:none;">Logout</button>
     </footer>
 </main>
 
