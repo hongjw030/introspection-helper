@@ -6,7 +6,7 @@
   "author": "hongjw030",
   "permissions": [
     "identity",
-    "activeTap",
+    "alarms",
     "scripting",
     "storage",
     "unlimitedStorage",
