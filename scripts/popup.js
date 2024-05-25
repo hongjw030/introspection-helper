@@ -111,6 +111,15 @@ document.addEventListener('DOMContentLoaded', function() {
     alert("임시 저장되었습니다! submit 버튼으로 제출하면 자동으로 저장된 내용은 사라집니다.");
   })
 
+// 리셋 버튼 기능
+  document.getElementById('extension-reset-button').addEventListener('click', function(){
+    chrome.storage.local.get(['savedTemplate', 'savedText'], (result)=>{
+      const textarea = document.getElementById('extension-post-textarea');
+      textarea.value = result.savedTemplate ?? "";
+      chrome.storage.local.remove('savedText');
+    })
+  })
+
   // 제출 버튼 기능
   document.getElementById('extension-submit-button').addEventListener('click', function() {
     chrome.storage.local.get('githubToken', function(result) {
