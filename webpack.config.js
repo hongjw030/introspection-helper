@@ -10,7 +10,8 @@ module.exports = {
   mode:"production",
   entry: {
     popup: './scripts/popup.js', 
-    option: './scripts/option.js'
+    option: './scripts/option.js',
+    background: './scripts/background.js'
   },
   output: {
     filename: '[name].bundle.js',   // 번들링된 파일의 이름을 지정합니다.
