@@ -12,13 +12,17 @@ import { setReadyToPostScreen } from "./visibilities/setReadyToPostScreen";
 import { setRepoListScreen } from "./visibilities/setRepoListScreen";
 
 const [YEAR, MONTH, DAY] = getDateInformation();
+const FOLDER_PATH = `${YEAR}/${MONTH}`;
 const SUBMISSION_DATE = `${YEAR}${MONTH}${DAY}`;
 
 const CLIENT_ID = 'Ov23liS8uJ1LJSioNTPc';
-const CLIENT_SECRET = '904fcc78be315af16780349f2f74d701aeb3fd34';
+const CLIENT_SECRET ='904fcc78be315af16780349f2f74d701aeb3fd34';
+// chrome.storage.local의 키: ['githubToken', 'selectedRepo', 'nickname', 'savedText', 'savedTemplate', 'habit', 'submissionDate']
 
 document.addEventListener('DOMContentLoaded', function() {
-  chrome.storage.local.get(['githubToken', 'selectedRepo', 'nickname', 'savedText', 'savedTemplate', 'habit', 'submissionDate'], async function(result) {
+  const REDIRECT_URI = chrome.identity.getRedirectURL();
+
+  chrome.storage.local.get(null, async function(result) {
     if (result.githubToken) {
       // 깃헙 토큰이 있다면 로그인된 상태.
       if (result.selectedRepo) {
@@ -53,8 +57,8 @@ document.addEventListener('DOMContentLoaded', function() {
         }
       } else {
         // 레포 선택안한 채로 창을 끄면 재로그인해야 함.
-        let deleteToken = result.githubToken;
-        revokeToken(CLIENT_ID, CLIENT_SECRET, deleteToken);
+        revokeToken(CLIENT_ID, CLIENT_SECRET, result.githubToken);
+        chrome.identity.clearAllCachedAuthTokens();
         chrome.storage.local.clear();
         setLogoutScreen();
       }
@@ -66,8 +70,7 @@ document.addEventListener('DOMContentLoaded', function() {
 
   // 로그인 버튼 기능
   document.getElementById('extension-login-button').addEventListener('click', function() {
-    const redirectUri = chrome.identity.getRedirectURL();
-    const authUrl = `https://github.com/login/oauth/authorize?client_id=${CLIENT_ID}&redirect_uri=${encodeURIComponent(redirectUri)}&scope=repo`;
+    const authUrl = `https://github.com/login/oauth/authorize?client_id=${CLIENT_ID}&redirect_uri=${encodeURIComponent(REDIRECT_URI)}&scope=repo`;
 
     chrome.identity.launchWebAuthFlow({
       url: authUrl,
@@ -80,28 +83,33 @@ document.addEventListener('DOMContentLoaded', function() {
       const params = new URLSearchParams(new URL(redirectUrl).search);
       const code = params.get('code');
       // 로그인 시 토큰 받아오기
-      const token = await getToken(code, redirectUri);
-      chrome.storage.local.set({githubToken: token}, ()=>{
+      const token = await getToken(code, REDIRECT_URI);
+      chrome.storage.local.set({githubToken: token}, async ()=>{
+        // 토큰 받아오면 로그인 성공적으로 됐다는 뜻이므로 chooseRepoScreen 화면으로 넘어감.
         setChooseRepoScreen();
-      })
-      // 토큰 받으면 바로 유저 닉네임 받아오기
-      const nickname = await getNickname(token);
-      chrome.storage.local.set({nickname: nickname}, ()=>{
+
+        // 토큰으로 바로 유저 닉네임과 레포 리스트를 병렬적으로 받아오기
+        const userData = await Promise.all([
+          getNickname(token),
+          getRepoList(token)
+        ])
+
+        chrome.storage.local.set({nickname: userData[0]})
+        setRepoListScreen(userData[1], userData[0]);
       });
-      // 유저 닉네임 받으면 바로 레포 리스트 받아오기
-      const repoList = await getRepoList(token);
-      setRepoListScreen(repoList, nickname);
     });
   });
 
   // 로그아웃 버튼 기능
   document.getElementById('extension-logout-button').addEventListener('click', function() {
-    let deleteToken = chrome.storage.local.get('githubToken');
-    let isRevoked = revokeToken(CLIENT_ID, CLIENT_SECRET, deleteToken);
-    if (isRevoked){
-      chrome.storage.local.clear();
-      setLogoutScreen();
-    }else return;
+    chrome.storage.local.get(['githubToken'], (result)=>{
+      let isRevoked = revokeToken(CLIENT_ID, CLIENT_SECRET, result.githubToken);
+      chrome.identity.clearAllCachedAuthTokens();
+      if (isRevoked){
+        chrome.storage.local.clear();
+        setLogoutScreen();
+      }else return;
+    });
   });
 
 // 임시저장 버튼 기능
@@ -122,27 +130,18 @@ document.addEventListener('DOMContentLoaded', function() {
 
   // 제출 버튼 기능
   document.getElementById('extension-submit-button').addEventListener('click', function() {
-    chrome.storage.local.get('githubToken', function(result) {
+    chrome.storage.local.get(['githubToken', 'selectedRepo', 'nickname'], function(result) {
       const token = result.githubToken;
-
-      chrome.storage.local.get('selectedRepo', function(repoResult) {
-        const repoName = repoResult.selectedRepo;
-        const content = document.getElementById('extension-post-textarea').value;
-
-        const fileName = `${SUBMISSION_DATE}.md`;
-        chrome.storage.local.get('nickname', function(ownerResult){
-          const nickname = ownerResult.nickname;
-          if (!nickname){
-            return;
-          }
-          createFileAndCommit(token, repoName, fileName, content, nickname);
-        })
-      });
+      const repoName = result.selectedRepo;
+      const content = document.getElementById('extension-post-textarea').value;
+      const fileName = `${SUBMISSION_DATE}.md`;
+      const nickname = result.nickname;
+      createFileAndCommit(token, repoName, fileName, content, nickname);
     });
-    chrome.storage.local.remove(['savedText'], function() {})
   });
 });
 
+// md 파일 커밋 함수
 function createFileAndCommit(token, repoName, fileName, content, nickname) {
 
   function createFileInFolder(token, repoName, fileName, content, nickname, folderPath) {
@@ -257,6 +256,8 @@ function createFileAndCommit(token, repoName, fileName, content, nickname) {
             message: 'Create new Markdown file',
             content: encodeBase64(content) // encode content to base64
           })
+        }).then(()=>{
+          chrome.storage.local.remove('savedText')
         });
       } else {
         // 파일이 이미 존재하므로 새 파일 이름을 입력받음
@@ -293,7 +294,6 @@ function createFileAndCommit(token, repoName, fileName, content, nickname) {
       }
     });
   }
-  const folderPath = `${YEAR}/${MONTH}`;
 
-  createFileInFolder(token, repoName, fileName, content, nickname, folderPath);
+  createFileInFolder(token, repoName, fileName, content, nickname, FOLDER_PATH);
 }
