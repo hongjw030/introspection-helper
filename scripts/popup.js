@@ -15,8 +15,8 @@ const [YEAR, MONTH, DAY] = getDateInformation();
 const FOLDER_PATH = `${YEAR}/${MONTH}`;
 const SUBMISSION_DATE = `${YEAR}${MONTH}${DAY}`;
 
-const CLIENT_ID = 'Ov23liS8uJ1LJSioNTPc';
-const CLIENT_SECRET ='904fcc78be315af16780349f2f74d701aeb3fd34';
+const CLIENT_ID = 'Ov23lisuJkODBkIrQm4e';
+const CLIENT_SECRET ='2483bad98853659aade58aa88f50b1a44765775a';
 // chrome.storage.local의 키: ['githubToken', 'selectedRepo', 'nickname', 'savedText', 'savedTemplate', 'habit', 'submissionDate']
 
 document.addEventListener('DOMContentLoaded', function() {
