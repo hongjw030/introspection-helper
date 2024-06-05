@@ -34,6 +34,10 @@
 
 ## 크롬 마켓에서 설치하기
 
+해당 링크에서 설치할 수 있습니다. 
+
+[크롬 마켓 바로 가기](https://chromewebstore.google.com/detail/introspection-helper/gifbolfogdiniebgljncdinaehkciohk?hl=ko)
+
 <br/>
 <br/>
 
@@ -42,12 +46,23 @@
 ## 기본 사용법 
 (로그인, 레포 선택, that's it!! 이제 input에 글을 쓰고 commit하세요. 날짜별로 자동으로 year/month 폴더가 생성됩니다. 만약 하루에 두 번 commit하려 하면 파일이름이 중복돼요. 그럼 prompt 창이 떠서 새 이름을 입력할 수도 있습니다.)
 
-1. 깃허브 로그인을 진행해주세요.
+1. `Github Login` 버튼을 눌러 깃허브 로그인을 진행해주세요.
+![alt text](assets/tutorial/login.png)
+
 2. 회고를 올릴 레포지토리를 선택해주세요.
-3. 이제 마크다운 형식으로 글을 쓰고 submit 하면, 자동으로 글이 push됩니다! submit 한 날짜에 따라 {year} 폴더, {month} 폴더가 생성되고, 그 안에 오늘자 회고.md 파일이 생성됩니다. 
+![alt text](assets/tutorial/choose.png)
+
+3. 이제 마크다운 형식으로 글을 쓰고 `submit 버튼`을 누르면, 자동으로 글이 push됩니다! submit 한 날짜에 따라 {year} 폴더, {month} 폴더가 생성되고, 그 안에 오늘자 회고.md 파일이 생성됩니다. 
+
 4. 만약 하루에 여러 번 submit 하면 동일한 이름의 파일이 존재하기 때문에 새 이름을 입력하라는 prompt 창이 뜹니다.
-5. 글을 임시 저장하고 싶다면 save 버튼을 눌러주세요. (단, submit 버튼으로 글을 push하면 saved text는 삭제됩니다!)
-6. 다른 레포지토리와 연결하고 싶다면 로그아웃하고 다시 연결해주세요.
+![alt text](assets/tutorial/alertrename.png)
+
+5. 글을 임시 저장하고 싶다면 `save 버튼`을 눌러주세요. (단, submit 버튼으로 글을 push하면 saved text는 삭제됩니다!)
+![alt text](assets/tutorial/save.png)
+
+6. 다른 레포지토리와 연결하고 싶다면 `Logout` 버튼을 눌러 로그아웃하고 다시 연결해주세요.
+
+7. 옵션을 설정하고 싶다면 `more options` 버튼을 눌러주세요.
 
 <br/>
 <br/>

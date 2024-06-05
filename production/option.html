@@ -1,0 +1,49 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <title>Introspection Helper</title>
+  <meta charset="UTF-8" />
+  <meta http-equiv="x-ua-compatible" content="IE=edge" />
+  <link rel="stylesheet" href="./styles/popup.css">
+  <script type="module" src="./dist/option.bundle.js"></script>
+</head>
+<body id="extension-option-body">
+  <main id="extension-main" class="main">
+    <header class="header">
+      <span class="header__span text--highlighted">Introspection </span>
+      <span class="header__span">Helper </span>
+    </header>
+
+    <a id="extension-option-popup-a" class="a a--popup" href="popup.html">back to textarea</a>
+    
+    <section id="extension-option-clock-section" class="option--section section--clock">
+      <h2 class="section__title">Time Option</h2>
+      <label for="extension-option-habit-checkbox">
+        <input type="checkbox" id="extension-option-habit-checkbox" class="checkbox section__checkbox section__checkbox--habit"/>
+        Check to know if you'v write introspection!
+      </label>
+      <!-- 3. 시간 알림 설정 기능 checkbox + 시계 설정 기능 -->
+    </section>
+
+    <!-- <section id="extension-option-convention-section" class="option--section section--convention">
+      1. 폴더 이름 바꾸는 기능 input / save 버튼 / 현재 폴더 이름 text / reset 버튼
+      <br/>
+      2. 파일 이름 바꾸는 기능 input / save 버튼 / 현재 파일 이름 text / reset 버튼
+      <br/>
+      3. 커밋 메세지 바꾸는 기능 input / save 버튼 / 현재 커밋메세지 이름 text / reset 버튼
+      <br/>
+    </section> -->
+    
+    <section id="extension-option-template-section" class="option--section section--template">
+      <h2 class="section__title">Template Option</h2>
+      <textarea id="extension-option-template-textarea" class="textarea section__textarea section__textarea--template" placeholder="Custom your template!"></textarea>
+      <div class="div--buttonList">
+        <button id="extension-option-template-save-button" class="button button--save button--primary">save</button>
+        <button id="extension-option-template-reset-button" class="button button--reset button--warning">reset</button>
+      </div>
+    </section>
+
+
+  </main>
+</body>
+</html>

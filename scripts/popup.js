@@ -21,7 +21,6 @@ const CLIENT_SECRET ='904fcc78be315af16780349f2f74d701aeb3fd34';
 
 document.addEventListener('DOMContentLoaded', function() {
   const REDIRECT_URI = chrome.identity.getRedirectURL();
-
   chrome.storage.local.get(null, async function(result) {
     if (result.githubToken) {
       // 깃헙 토큰이 있다면 로그인된 상태.
@@ -71,12 +70,12 @@ document.addEventListener('DOMContentLoaded', function() {
   // 로그인 버튼 기능
   document.getElementById('extension-login-button').addEventListener('click', function() {
     const authUrl = `https://github.com/login/oauth/authorize?client_id=${CLIENT_ID}&redirect_uri=${encodeURIComponent(REDIRECT_URI)}&scope=repo`;
-
     chrome.identity.launchWebAuthFlow({
       url: authUrl,
       interactive: true
     }, async function(redirectUrl) {
       if (chrome.runtime.lastError) {
+        console.error(chrome.runtime.lastError)
         return;
       }
 

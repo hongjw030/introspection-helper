@@ -1,0 +1,149 @@
+*{
+  box-sizing: border-box;
+}
+
+#extension-main {
+  padding: 20px 5px 5px;
+  width: 400px;
+  display: flex;
+  flex-direction: column;
+  justify-content:center;
+  align-items:center;
+  gap: 1rem;
+}
+
+.header{
+  font-size: 2rem;
+  font-weight: 700;
+}
+
+.button{
+  width: 100%;
+  height: 32px;
+  border: none;
+  border-radius: 8px;
+  color: #ffffff;
+  cursor: pointer;
+  justify-content: center;
+  align-items:center;
+}
+.text--highlighted{
+  color: #00bbaa
+ }
+ .button--primary{
+  background-color: #00bbaa;
+ }
+ .button--secondary{
+  background-color: #ffaa33;
+ }
+ .button--warning{
+  background-color: #fa4D79
+ }
+ .section__title{
+  font-size:1rem;
+  font-weight:700;
+  margin: 0;
+  padding: 0;
+}
+ .section{
+   width:100%; 
+   display: flex;
+   flex-direction: column;
+   justify-content:center;
+   align-items:center;
+   gap: 8px;
+ }
+ .option--section{
+  width:100%; 
+  display: flex;
+  flex-direction: column;
+  justify-content:start;
+  align-items:start;
+  gap: 8px;
+}
+ .section__p{
+  font-size: 0.8rem;
+  padding: 0;
+  margin: 0;
+}
+.p__span .text--highlighted{
+  font-size: 1rem;
+  font-weight: 500;
+}
+.ul{
+  width:100%;
+  list-style: none;
+  font-size: 1rem;
+}
+.extension-li{
+  padding: 4px;
+}
+.extension-li:hover{
+  color:#00bbaa;
+}
+
+.footer{
+  border-top: 1px solid #aaaaaa;
+  width:100%;
+  display:flex;
+  flex-direction: column;
+  gap: 1rem;
+  padding: 10px 20px 0px;
+  margin-top: 20px;
+}
+.footer__a{
+  color: black;
+  text-decoration: none;
+}
+
+.footer__div{
+  font-size: 0.8rem;
+  display:flex;
+  justify-content: space-between;
+}
+
+ /* button, input 스타일 */
+ .section__textarea {
+  width: 100%;
+  height: 200px;
+  border-radius: 8px;
+  border: 1px solid #aaaaaa;
+}
+
+.div--buttonList{
+  display: flex;
+  gap: 1rem;
+  width: 100%;
+}
+
+.p__article--habit{
+  font-weight: 600;
+  font-size: 0.8rem;
+  padding: 8px;
+  border-radius: 8px;
+}
+[data-isChecked=false]{
+  color:#fa4D79;
+}
+[data-isChecked=true]{
+  color:#00bbaa;
+}
+.a--logout{
+  width: 80px;
+  font-size: 0.8rem;
+  position: absolute;
+  top: 5px;
+  left: 30px;
+  background-color: transparent;
+  cursor: pointer;
+  color: #fa4D79;
+  border: none;
+  text-decoration: underline;
+}
+
+.a--option, .a--popup{
+  font-size: 0.8rem;
+  position: absolute;
+  top: 5px;
+  right: 30px;
+}
