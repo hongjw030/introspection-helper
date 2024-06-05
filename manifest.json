@@ -1,7 +1,7 @@
 {
   "manifest_version": 3,
   "name": "Introspection Helper",
-  "version": "1.0.1",
+  "version": "2.0.0",
   "description": "input에 회고를 작성하면, 마크다운 파일로 만들어 깃허브 레파지토리에 커밋해줍니다.",
   "author": "hongjw030",
   "permissions": [
