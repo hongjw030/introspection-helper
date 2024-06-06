@@ -60,7 +60,7 @@ document.addEventListener('DOMContentLoaded', function() {
   // 커밋 저장 버튼 기능
   document.getElementById('option-commit-save-button').addEventListener('click', function(){
     const commitInput = document.getElementById('option-commit-input');
-    if (!commitInput.value || commitInput.value == ''){
+    if (!commitInput.value || commitInput.value.trim() == ''){
       alert('커밋 메세지는 반드시 있어야 합니다.');
     }
     else{
