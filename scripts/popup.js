@@ -294,6 +294,9 @@ function createFileAndCommit(token, repoName, fileName, content, nickname) {
           })
         }).then(()=>{
           chrome.storage.local.remove('savedText')
+          const textarea = document.getElementById('post-textarea');
+          textarea.value = '';
+          alert("오늘의 회고를 작성했습니다!");
         });
       } else {
         // 파일이 이미 존재하므로 새 파일 이름을 입력받음
