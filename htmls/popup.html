@@ -4,6 +4,7 @@
   <title>Dev Helper</title>
   <meta charset="UTF-8" />
   <meta http-equiv="x-ua-compatible" content="IE=edge" />
+  <link rel="stylesheet" href="../styles/global.css">
   <link rel="stylesheet" href="../styles/popup.css">
   <script type="module" src="../dist/popup.bundle.js"></script>
 </head>
@@ -22,14 +23,15 @@
       <ul id="repoList-ul"></ul>
     </section>
   
-    <section id="user-section" style="display:none;">
-      <span>Selected Repo : </span>
-      <span id="user-selectedRepo-span" class="highlighted"></span>
-    </section>
-    
     <section id="post-section" style="display:none;">
-      <a href="option.html">more options</a>
-      <button id="logout-button" arial-role="logout" style="display:none;">Logout</button>
+      <article id="user-section" style="display:none;">
+        <span>Selected Repo : </span>
+        <span id="user-selectedRepo-span" class="highlighted"></span>
+      </article>
+      <article>
+        <a href="option.html">more options</a>
+        <button id="logout-button" arial-role="logout" style="display:none;">Logout</button>
+      </article>
 
       <article id="optional-habit-article" style="display: none;" data-isChecked="false"></article>
 
@@ -50,7 +52,7 @@
       </a>
       <a href="mailto:hongjw030@naver.com">
         <img src="../assets/mail.svg" width="20px" height="20px"/> 
-        <span>Main to</span>
+        <span>Mail to</span>
       </a>
       <a href="https://github.com/hongjw030/introspection-helper" target="_blank">
         <img src="../assets/github.svg" width="20px" height="20px"/> 

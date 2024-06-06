@@ -29,7 +29,7 @@
   "content_scripts": [
     {
       "matches": ["<all_urls>"],
-      "css": ["styles/popup.css"],
+      "css": ["styles/popup.css", "styles/global.css"],
       "js": ["dist/option.bundle.js", "dist/popup.bundle.js"]
     }
   ],
