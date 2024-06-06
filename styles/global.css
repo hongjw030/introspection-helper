@@ -81,6 +81,15 @@ main.extension {
   color:#00bbaa;
 }
 
+.extension a{
+  color: blue;
+  text-decoration: none;
+}
+.extension a:hover{
+  font-weight: 600;
+  text-decoration: underline;
+}
+
 .extension footer{
   border-top: 1px solid #aaaaaa;
   width:100%;
@@ -123,6 +132,9 @@ main.extension {
   height: 3rem;
   top: 1rem;
   right: 1rem;
+  display: flex;
+  justify-content: center;
+  align-items: center;
 }
 
 [data-isChecked=false]{
