@@ -148,3 +148,8 @@ main.extension {
   color:white;
   background-color:#222222;
 }
+
+.dark-theme textarea{
+  background-color: #222222;
+  color: white;
+}
