@@ -17,10 +17,29 @@ const SUBMISSION_DATE = `${YEAR}${MONTH}${DAY}`;
 
 const CLIENT_ID = 'Ov23lisuJkODBkIrQm4e';
 const CLIENT_SECRET ='2483bad98853659aade58aa88f50b1a44765775a';
-// chrome.storage.local의 키: ['githubToken', 'selectedRepo', 'nickname', 'savedText', 'savedTemplate', 'habit', 'submissionDate']
+// chrome.storage.local의 키: ['githubToken', 'selectedRepo', 'nickname', 'savedText', 'savedTemplate', 'habit', 'submissionDate', 'isLight']
 
 document.addEventListener('DOMContentLoaded', function() {
   const REDIRECT_URI = chrome.identity.getRedirectURL();
+  chrome.storage.local.get('isLight', (result)=>{
+    if(!result.isLight || result.isLight==='yes'){
+      const mainBody = document.getElementById('extension-body');
+      const themeButton = document.getElementById('theme-button');
+      const themeImg = document.getElementById('theme-img');
+      themeButton.setAttribute('data-isLight', 'yes');
+      themeImg.setAttribute('src', "../assets/sun.svg");
+      mainBody.setAttribute('class', "")
+      chrome.storage.local.set({'isLight': 'yes'});
+    }else{
+      const mainBody = document.getElementById('extension-body');
+      const themeButton = document.getElementById('theme-button');
+      const themeImg = document.getElementById('theme-img');
+      themeButton.setAttribute('data-isLight', 'no');
+      themeImg.setAttribute('src', "../assets/moon.svg");
+      mainBody.setAttribute('class', "dark-theme")
+      chrome.storage.local.set({'isLight': 'no'});
+    }
+  })
   chrome.storage.local.get(null, async function(result) {
     if (result.githubToken) {
       // 깃헙 토큰이 있다면 로그인된 상태.
@@ -66,6 +85,24 @@ document.addEventListener('DOMContentLoaded', function() {
       setLogoutScreen();
     }
   });
+  document.getElementById('theme-button').addEventListener('click',()=>{
+    const mainBody = document.getElementById('extension-body');
+    const themeButton = document.getElementById('theme-button');
+    const themeImg = document.getElementById('theme-img');
+    chrome.storage.local.get('isLight', (result)=>{
+      if (result.isLight === 'yes'){
+        themeButton.setAttribute('data-isLight', 'no');
+        themeImg.setAttribute('src', "../assets/moon.svg");
+        mainBody.setAttribute('class', "dark-theme")
+        chrome.storage.local.set({'isLight': 'no'});
+      }else{
+        themeButton.setAttribute('data-isLight', 'yes');
+        themeImg.setAttribute('src', "../assets/sun.svg");
+        mainBody.setAttribute('class', "")
+        chrome.storage.local.set({'isLight': 'yes'});
+      }
+    });
+  })
 
   // 로그인 버튼 기능
   document.getElementById('login-button').addEventListener('click', function() {

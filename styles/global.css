@@ -117,9 +117,22 @@ main.extension {
   width: 100%;
 }
 
+#theme-button{
+  position: absolute;
+  width: 3rem;
+  height: 3rem;
+  top: 1rem;
+  right: 1rem;
+}
+
 [data-isChecked=false]{
   color:#fa4D79;
 }
 [data-isChecked=true]{
   color:#00bbaa;
+}
+
+.dark-theme{
+  color:white;
+  background-color:#222222;
 }
