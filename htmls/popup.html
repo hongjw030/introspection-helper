@@ -9,54 +9,53 @@
 </head>
 
 <body id="extension-body">
-  <main id="extension-main" class="main">
-    <header id="extension-header" class="header">
-      <span class="header__span text--highlighted">Introspection </span>
-      <span class="header__span">Helper </span>
+  <main id="extension-main" class="extension">
+    <header>
+      <span class="highlighted">Introspection </span>
+      <span>Helper </span>
     </header>
     
-    <button id="extension-login-button" class="button button--login button--primary" style="display:none;">GitHub Login</button>
+    <button id="login-button" class="button--primary" style="display:none;">GitHub Login</button>
     
-    <section id="extension-repoList-section" class="section section--repoList" style="display:none;">
-      <h2 class="section__title">Choose repository!</h2>
-      <ul id="extension-repoList-ul" aria-describedby="repository list" class="ul section__ul--repoList"></ul>
+    <section id="repoList-section" style="display:none;">
+      <h2>Choose repository!</h2>
+      <ul id="repoList-ul"></ul>
     </section>
   
-    <section id="extension-user-section" class="section section--user" style="display:none;">
-      <p id="extension-user-selectedRepo-p" class="p section__p section__p--user--selectedRepo">
-        <span class="p__span">Selected Repo : </span>
-        <span id="extension-user-selectedRepo-span" class="p__span text--highlighted"></span>
-      </p>
+    <section id="user-section" style="display:none;">
+      <span>Selected Repo : </span>
+      <span id="user-selectedRepo-span" class="highlighted"></span>
     </section>
     
-    <section id="extension-post-section" class="section section--post" style="display:none;">
-      <a id="extension-option-a" class="a a--option" href="option.html">more options</a>
-      <button id="extension-logout-button" arial-role="logout" class="a a--logout" style="display:none;">Logout</button>
+    <section id="post-section" style="display:none;">
+      <a href="option.html">more options</a>
+      <button id="logout-button" arial-role="logout" style="display:none;">Logout</button>
 
-      <article id="extension-optional-habit-article" class="article p__article p__article--habit" style="display: none;" data-isChecked="false"></article>
+      <article id="optional-habit-article" style="display: none;" data-isChecked="false"></article>
 
-      <div class="div--buttonList">
-        <button id="extension-save-button" class="button button--save button--secondary">save</button>
-        <button id="extension-reset-button" class="button button--reset button--warning">reset</button>
+      <div class="buttonList">
+        <button id="save-button" class="button--secondary">save</button>
+        <button id="reset-button" class="button--warning">reset</button>
       </div>
 
-      <textarea id="extension-post-textarea" class="textarea section__textarea section__textarea--post" placeholder="type your introspection!"></textarea>
+      <textarea id="post-textarea" placeholder="type your introspection!"></textarea>
 
-      <button id="extension-submit-button" class="button button--submit button--primary">Submit</button>
+      <button id="submit-button" class="button--primary">Submit</button>
     </section>
   
-    <footer class="footer">
-      <div class="footer__div">
-        <article class="footer__article--link">
-          <a href="chrome-extension://lfeklebbhdgpcnndldcpnppfopkloamf/htmls/tutorial.html" target="_blank" class="footer__a"><img src="../assets/home.svg" width="20px" height="20px"/> Tutorial</a>
-        </article>
-        <article class="footer__article--link">
-          <a href="mailto:hongjw030@naver.com" class="footer__a"><img src="../assets/mail.svg" width="20px" height="20px"/> Mail to</a>
-        </article>
-        <article class="footer__article--link">
-          <a href="https://github.com/hongjw030/introspection-helper" target="_blank" class="footer__a"><img src="../assets/github.svg" width="20px" height="20px"/> Repository</a>
-        </article>
-      </div>
+    <footer>
+      <a href="chrome-extension://lfeklebbhdgpcnndldcpnppfopkloamf/htmls/tutorial.html" target="_blank">
+        <img src="../assets/home.svg" width="20px" height="20px"/> 
+        <span>Tutorial</span>
+      </a>
+      <a href="mailto:hongjw030@naver.com">
+        <img src="../assets/mail.svg" width="20px" height="20px"/> 
+        <span>Main to</span>
+      </a>
+      <a href="https://github.com/hongjw030/introspection-helper" target="_blank">
+        <img src="../assets/github.svg" width="20px" height="20px"/> 
+        <span>Repository</span>
+      </a>
     </footer>
 </main>
 

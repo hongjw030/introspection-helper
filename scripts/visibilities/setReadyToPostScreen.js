@@ -2,13 +2,13 @@
 // 로그인했고 repo도 선택한 상태.
 
 export function setReadyToPostScreen(nickname, repoName){
-  document.getElementById('extension-login-button').style.display = 'none';
-  document.getElementById('extension-repoList-section').style.display = 'none';
+  document.getElementById('login-button').style.display = 'none';
+  document.getElementById('repoList-section').style.display = 'none';
 
-  document.getElementById('extension-logout-button').style.display = 'flex';
-  document.getElementById('extension-post-section').style.display = 'flex';
-  document.getElementById('extension-user-section').style.display='flex';
+  document.getElementById('logout-button').style.display = 'flex';
+  document.getElementById('post-section').style.display = 'flex';
+  document.getElementById('user-section').style.display='flex';
 
-  const selectedRepoSpan = document.getElementById('extension-user-selectedRepo-span');
+  const selectedRepoSpan = document.getElementById('user-selectedRepo-span');
   selectedRepoSpan.innerHTML = `<a href="https://www.github.com/${nickname}/${repoName}" target="_blank" class="text--highlighted">${repoName}</a>`;
 }

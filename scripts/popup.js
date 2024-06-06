@@ -28,7 +28,7 @@ document.addEventListener('DOMContentLoaded', function() {
         // 이미 레포를 선택했었다면 ReadyToPost 화면을 보여줌.
         setReadyToPostScreen(result.nickname, result.selectedRepo);
 
-        const textarea = document.getElementById('extension-post-textarea');
+        const textarea = document.getElementById('post-textarea');
         if (result.savedText){
           // 저장했던 글이 있다면 불러오기.
           textarea.value = result.savedText;
@@ -37,7 +37,7 @@ document.addEventListener('DOMContentLoaded', function() {
           textarea.value = result.savedTemplate;
         }
 
-        const habitSection = document.getElementById('extension-optional-habit-article');
+        const habitSection = document.getElementById('optional-habit-article');
         if(result.habit){
           // 오늘 회고 작성했는지 여부 볼 수 있음.
           habitSection.style.display='flex';
@@ -68,7 +68,7 @@ document.addEventListener('DOMContentLoaded', function() {
   });
 
   // 로그인 버튼 기능
-  document.getElementById('extension-login-button').addEventListener('click', function() {
+  document.getElementById('login-button').addEventListener('click', function() {
     const authUrl = `https://github.com/login/oauth/authorize?client_id=${CLIENT_ID}&redirect_uri=${encodeURIComponent(REDIRECT_URI)}&scope=repo`;
     chrome.identity.launchWebAuthFlow({
       url: authUrl,
@@ -100,7 +100,7 @@ document.addEventListener('DOMContentLoaded', function() {
   });
 
   // 로그아웃 버튼 기능
-  document.getElementById('extension-logout-button').addEventListener('click', function() {
+  document.getElementById('logout-button').addEventListener('click', function() {
     chrome.storage.local.get(['githubToken'], (result)=>{
       let isRevoked = revokeToken(CLIENT_ID, CLIENT_SECRET, result.githubToken);
       chrome.identity.clearAllCachedAuthTokens();
@@ -112,27 +112,27 @@ document.addEventListener('DOMContentLoaded', function() {
   });
 
 // 임시저장 버튼 기능
-  document.getElementById('extension-save-button').addEventListener('click', function(){
-    const textarea = document.getElementById('extension-post-textarea');
+  document.getElementById('save-button').addEventListener('click', function(){
+    const textarea = document.getElementById('post-textarea');
     chrome.storage.local.set({savedText: textarea.value});
     alert("임시 저장되었습니다! submit 버튼으로 제출하면 자동으로 저장된 내용은 사라집니다.");
   })
 
 // 리셋 버튼 기능
-  document.getElementById('extension-reset-button').addEventListener('click', function(){
+  document.getElementById('reset-button').addEventListener('click', function(){
     chrome.storage.local.get(['savedTemplate', 'savedText'], (result)=>{
-      const textarea = document.getElementById('extension-post-textarea');
+      const textarea = document.getElementById('post-textarea');
       textarea.value = result.savedTemplate ?? "";
       chrome.storage.local.remove('savedText');
     })
   })
 
   // 제출 버튼 기능
-  document.getElementById('extension-submit-button').addEventListener('click', function() {
+  document.getElementById('submit-button').addEventListener('click', function() {
     chrome.storage.local.get(['githubToken', 'selectedRepo', 'nickname'], function(result) {
       const token = result.githubToken;
       const repoName = result.selectedRepo;
-      const content = document.getElementById('extension-post-textarea').value;
+      const content = document.getElementById('post-textarea').value;
       const fileName = `${SUBMISSION_DATE}.md`;
       const nickname = result.nickname;
       createFileAndCommit(token, repoName, fileName, content, nickname);
@@ -275,12 +275,12 @@ function createFileAndCommit(token, repoName, fileName, content, nickname) {
       if (response.status === 201) {
         chrome.storage.local.set({'submissionDate': SUBMISSION_DATE})
         if(chrome.storage.local.get('habit')){
-          const habitSection = document.getElementById('extension-optional-habit-article');
+          const habitSection = document.getElementById('optional-habit-article');
           habitSection.setAttribute("data-isChecked", 'true')
           habitSection.textContent = `${YEAR}년 ${MONTH}월 ${DAY}일 회고를 작성했어요! 💯`;
         }
         chrome.storage.local.get('savedTemplate', (result)=>{
-          document.getElementById('extension-post-textarea').value = result.savedTemplate ?? "";
+          document.getElementById('post-textarea').value = result.savedTemplate ?? "";
           alert(`파일 ${fileName}이(가) 생성되었습니다.`);
         })
       } else {

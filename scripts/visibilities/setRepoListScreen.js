@@ -1,7 +1,7 @@
 import { setReadyToPostScreen } from "./setReadyToPostScreen";
 
 export function setRepoListScreen(repos, nickname) {
-  const repoList = document.getElementById('extension-repoList-ul');
+  const repoList = document.getElementById('repoList-ul');
   if (!repoList) return;
 
   repoList.innerHTML = '';
@@ -16,7 +16,6 @@ export function setRepoListScreen(repos, nickname) {
   if (repos.length > 0){
     repos.forEach(repo => {
       const li = document.createElement('li');
-      li.setAttribute('class', "extension-li")
       li.textContent = repo.name;
       repoList.appendChild(li);
     });
