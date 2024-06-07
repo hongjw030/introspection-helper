@@ -18,12 +18,12 @@ html{
     justify-content:center;
     align-items:center;
     gap: 2rem;
-    padding: 2rem;
+    padding: 1rem;
   }
   
   /* header 태그 기본 디자인 */
   .extension header{
-    font-size: 2rem;
+    font-size: 2.4rem;
     font-weight: 700;
   }
   
