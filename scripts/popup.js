@@ -43,14 +43,13 @@ document.addEventListener('DOMContentLoaded', function() {
         // 저장했던 글이 있다면 불러오기.
         textarea.value = result.savedText;
       }else if (result.savedTemplate){
-        // 저장한 글이 없다면 , 템플릿이 있다면 그거 불러오기
+        // 저장한 글이 없다면, 템플릿이 있다면 그거 불러오기
         textarea.value = result.savedTemplate;
       }
       if(result.habit){
         // 오늘 회고 작성했는지 여부 볼 수 있음.
         habitSection.style.display='flex';
-        const prevDate = result.submissionDate;
-        const isSubmitted = prevDate === SUBMISSION_DATE;
+        const isSubmitted = result.submissionDate === SUBMISSION_DATE;
         habitSection.setAttribute('data-isChecked', isSubmitted ? 'true' : 'false');
         habitSection.textContent = isSubmitted ? `${YEAR}년 ${MONTH}월 ${DAY}일 회고를 작성했어요! 💯` : `${YEAR}년 ${MONTH}월 ${DAY}일 회고를 작성하지 않았어요! 😐`;
       }else{
@@ -59,6 +58,7 @@ document.addEventListener('DOMContentLoaded', function() {
     }
   });
 
+  // 테마 버튼 기능
   document.getElementById('theme-button').addEventListener('click',()=>{
     chrome.storage.local.get('isLight', (result)=>{
       const isLight = result.isLight === 'yes' || !result.isLight;
@@ -79,7 +79,6 @@ document.addEventListener('DOMContentLoaded', function() {
         console.error(chrome.runtime.lastError)
         return;
       }
-
       const params = new URLSearchParams(new URL(redirectUrl).search);
       const code = params.get('code');
       // 로그인 시 토큰 받아오기
@@ -87,13 +86,11 @@ document.addEventListener('DOMContentLoaded', function() {
       chrome.storage.local.set({githubToken: token}, async ()=>{
         // 토큰 받아오면 로그인 성공적으로 됐다는 뜻이므로 chooseRepoScreen 화면으로 넘어감.
         setChooseRepoScreen();
-
         // 토큰으로 바로 유저 닉네임과 레포 리스트를 병렬적으로 받아오기
         const userData = await Promise.all([
           getNickname(token),
           getRepoList(token)
         ])
-
         chrome.storage.local.set({nickname: userData[0]})
         setRepoListScreen(userData[1], userData[0]);
       });
@@ -130,13 +127,10 @@ document.addEventListener('DOMContentLoaded', function() {
 
   // 제출 버튼 기능
   document.getElementById('submit-button').addEventListener('click', function() {
-    chrome.storage.local.get(['githubToken', 'selectedRepo', 'nickname'], function(result) {
-      const token = result.githubToken;
-      const repoName = result.selectedRepo;
+    chrome.storage.local.get(['githubToken', 'selectedRepo', 'nickname'], function({githubToken, selectedRepo, nickname}) {
       const content = document.getElementById('post-textarea').value;
       const fileName = `${SUBMISSION_DATE}.md`;
-      const nickname = result.nickname;
-      createFileAndCommit(token, repoName, fileName, content, nickname);
+      createFileAndCommit(githubToken, selectedRepo, fileName, content, nickname);
     });
   });
 });
