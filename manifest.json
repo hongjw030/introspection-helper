@@ -26,6 +26,7 @@
     "default_title": "DEV) Helper",
     "default_popup": "htmls/popup.html"
   },
+  "options_page": "htmls/option.html",
   "content_scripts": [
     {
       "matches": ["<all_urls>"],

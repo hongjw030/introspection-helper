@@ -61,8 +61,6 @@ html{
     width:100%; 
     display: flex;
     flex-direction: column;
-    justify-content:center;
-    align-items:center;
     gap: 8px;
     font-size: 1.4rem;
   }
@@ -134,7 +132,12 @@ html{
     height: 3rem;
     border: 1px solid #aaaaaa;
   }
-  
+  .extension input[type='time'] {
+    border-radius: 1rem;
+    width: 100%;
+    height: 3rem;
+    border: 1px solid #aaaaaa;
+  }
   [data-isChecked=false]{
     color:#fa4D79;
   }
