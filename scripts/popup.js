@@ -21,86 +21,50 @@ const CLIENT_SECRET ='2483bad98853659aade58aa88f50b1a44765775a';
 
 document.addEventListener('DOMContentLoaded', function() {
   const REDIRECT_URI = chrome.identity.getRedirectURL();
-  chrome.storage.local.get('isLight', (result)=>{
-    if(!result.isLight || result.isLight==='yes'){
-      const mainBody = document.getElementById('extension-body');
-      const themeButton = document.getElementById('theme-button');
-      const themeImg = document.getElementById('theme-img');
-      themeButton.setAttribute('data-isLight', 'yes');
-      themeImg.setAttribute('src', "../assets/sun.svg");
-      mainBody.setAttribute('class', "")
-      chrome.storage.local.set({'isLight': 'yes'});
-    }else{
-      const mainBody = document.getElementById('extension-body');
-      const themeButton = document.getElementById('theme-button');
-      const themeImg = document.getElementById('theme-img');
-      themeButton.setAttribute('data-isLight', 'no');
-      themeImg.setAttribute('src', "../assets/moon.svg");
-      mainBody.setAttribute('class', "dark-theme")
-      chrome.storage.local.set({'isLight': 'no'});
-    }
-  })
+
   chrome.storage.local.get(null, async function(result) {
-    if (result.githubToken) {
-      // 깃헙 토큰이 있다면 로그인된 상태.
-      if (result.selectedRepo) {
-        // 이미 레포를 선택했었다면 ReadyToPost 화면을 보여줌.
-        setReadyToPostScreen(result.nickname, result.selectedRepo);
+    const isLight = !result.isLight || result.isLight === 'yes';
+    document.getElementById('extension-body').setAttribute('class', isLight ? "" : "dark-theme");
+    document.getElementById('theme-img').setAttribute('src', isLight ? "../assets/sun.svg" : "../assets/moon.svg");
+    chrome.storage.local.set({'isLight': isLight ? 'yes' : "no"});
 
-        const textarea = document.getElementById('post-textarea');
-        if (result.savedText){
-          // 저장했던 글이 있다면 불러오기.
-          textarea.value = result.savedText;
-        }else if (result.savedTemplate){
-          // 저장한 글이 없다면 , 템플릿이 있다면 그거 불러오기
-          textarea.value = result.savedTemplate;
-        }
-
-        const habitSection = document.getElementById('optional-habit-article');
-        if(result.habit){
-          // 오늘 회고 작성했는지 여부 볼 수 있음.
-          habitSection.style.display='flex';
-          const prevDate = result.submissionDate;
-          if (prevDate !== SUBMISSION_DATE){
-            // 오늘 제출 안했다면?
-            habitSection.setAttribute('data-isChecked', 'false')
-            habitSection.textContent = `${YEAR}년 ${MONTH}월 ${DAY}일 회고를 작성하지 않았어요! 😐`;
-          }else{
-            // 오늘 제출했다면?
-            habitSection.setAttribute('data-isChecked', 'true')
-            habitSection.textContent = `${YEAR}년 ${MONTH}월 ${DAY}일 회고를 작성했어요! 💯`;
-          }
-        }else{
-          habitSection.style.display='none';
-        }
-      } else {
-        // 레포 선택안한 채로 창을 끄면 재로그인해야 함.
-        revokeToken(CLIENT_ID, CLIENT_SECRET, result.githubToken);
-        chrome.identity.clearAllCachedAuthTokens();
-        chrome.storage.local.clear();
-        setLogoutScreen();
-      }
-    } else {
-      // github 토큰이 없다면 로그인이 안된 상태이므로 LogoutScreen 상태 보여짐.
+    if (!result.githubToken || !result.selectedRepo){
+      // 깃헙 토큰이 없거나 레포 선택 안했다면 로그인해야 함.
+      revokeToken(CLIENT_ID, CLIENT_SECRET, result.githubToken);
+      chrome.identity.clearAllCachedAuthTokens();
+      chrome.storage.local.clear();
       setLogoutScreen();
+    }else{
+      // 로그인했다면 post screen이 보임.
+      setReadyToPostScreen(result.nickname, result.selectedRepo);
+      const textarea = document.getElementById('post-textarea');
+      const habitSection = document.getElementById('optional-habit-article');
+      if (result.savedText){
+        // 저장했던 글이 있다면 불러오기.
+        textarea.value = result.savedText;
+      }else if (result.savedTemplate){
+        // 저장한 글이 없다면 , 템플릿이 있다면 그거 불러오기
+        textarea.value = result.savedTemplate;
+      }
+      if(result.habit){
+        // 오늘 회고 작성했는지 여부 볼 수 있음.
+        habitSection.style.display='flex';
+        const prevDate = result.submissionDate;
+        const isSubmitted = prevDate === SUBMISSION_DATE;
+        habitSection.setAttribute('data-isChecked', isSubmitted ? 'true' : 'false');
+        habitSection.textContent = isSubmitted ? `${YEAR}년 ${MONTH}월 ${DAY}일 회고를 작성했어요! 💯` : `${YEAR}년 ${MONTH}월 ${DAY}일 회고를 작성하지 않았어요! 😐`;
+      }else{
+        habitSection.style.display='none';
+      } 
     }
   });
+
   document.getElementById('theme-button').addEventListener('click',()=>{
-    const mainBody = document.getElementById('extension-body');
-    const themeButton = document.getElementById('theme-button');
-    const themeImg = document.getElementById('theme-img');
     chrome.storage.local.get('isLight', (result)=>{
-      if (result.isLight === 'yes'){
-        themeButton.setAttribute('data-isLight', 'no');
-        themeImg.setAttribute('src', "../assets/moon.svg");
-        mainBody.setAttribute('class', "dark-theme")
-        chrome.storage.local.set({'isLight': 'no'});
-      }else{
-        themeButton.setAttribute('data-isLight', 'yes');
-        themeImg.setAttribute('src', "../assets/sun.svg");
-        mainBody.setAttribute('class', "")
-        chrome.storage.local.set({'isLight': 'yes'});
-      }
+      const isLight = result.isLight === 'yes' || !result.isLight;
+      document.getElementById('extension-body').setAttribute('class', isLight ? 'dark-theme' : "");
+      document.getElementById('theme-img').setAttribute('src', isLight ? "../assets/moon.svg" : "../assets/sun.svg");
+      chrome.storage.local.set({'isLight': isLight ? 'no' : 'yes'})
     });
   })
 

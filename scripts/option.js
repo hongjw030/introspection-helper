@@ -14,34 +14,28 @@ document.addEventListener('DOMContentLoaded', function() {
     }
     if(!result.isLight || result.isLight==='yes'){
       const mainBody = document.getElementById('extension-body');
-      const themeButton = document.getElementById('theme-button');
       const themeImg = document.getElementById('theme-img');
-      themeButton.setAttribute('data-isLight', 'yes');
       themeImg.setAttribute('src', "../assets/sun.svg");
       mainBody.setAttribute('class', "")
       chrome.storage.local.set({'isLight': 'yes'});
     }else{
       const mainBody = document.getElementById('extension-body');
-      const themeButton = document.getElementById('theme-button');
       const themeImg = document.getElementById('theme-img');
-      themeButton.setAttribute('data-isLight', 'no');
       themeImg.setAttribute('src', "../assets/moon.svg");
       mainBody.setAttribute('class', "dark-theme")
       chrome.storage.local.set({'isLight': 'no'});
     }
   });
+  
   document.getElementById('theme-button').addEventListener('click',()=>{
     const mainBody = document.getElementById('extension-body');
-    const themeButton = document.getElementById('theme-button');
     const themeImg = document.getElementById('theme-img');
     chrome.storage.local.get('isLight', (result)=>{
       if (result.isLight === 'yes'){
-        themeButton.setAttribute('data-isLight', 'no');
         themeImg.setAttribute('src', "../assets/moon.svg");
         mainBody.setAttribute('class', "dark-theme")
         chrome.storage.local.set({'isLight': 'no'});
       }else{
-        themeButton.setAttribute('data-isLight', 'yes');
         themeImg.setAttribute('src', "../assets/sun.svg");
         mainBody.setAttribute('class', "")
         chrome.storage.local.set({'isLight': 'yes'});
