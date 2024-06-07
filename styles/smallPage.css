@@ -167,7 +167,7 @@ html{
     justify-content: center;
     align-items: center;
   }
-  #option-button{
+  #option-button, #pencil-button{
     position: absolute;
     width: 3rem;
     height: 3rem;
