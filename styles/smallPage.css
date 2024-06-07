@@ -1,0 +1,188 @@
+html{
+    font-size: 62.5%;
+  }
+  *{
+    box-sizing: border-box;
+    padding: 0;
+    margin: 0;
+  }
+  .highlighted{
+    color: #00bbaa !important;
+  }
+  
+  /* main 태그 기본 디자인 */
+  main.extension {
+    width: 36rem;
+    display: flex;
+    flex-direction: column;
+    justify-content:center;
+    align-items:center;
+    gap: 2rem;
+    padding: 2rem;
+  }
+  
+  /* header 태그 기본 디자인 */
+  .extension header{
+    font-size: 2rem;
+    font-weight: 700;
+  }
+  
+  /* button 태그 기본 디자인 */
+  .extension button{
+    width: 100%;
+    height: 32px;
+    border: none;
+    font-size: 1.4rem;
+    font-weight: 500;
+    border-radius: 8px;
+    color: #ffffff;
+    cursor: pointer;
+    justify-content: center;
+    align-items:center;
+  }
+  .button--primary{
+    background-color: #00bbaa !important;
+  }
+  .button--secondary{
+    background-color: #ffaa33 !important;
+  }
+  .button--warning{
+    background-color: #fa4D79 !important;
+  }
+  
+  /* h2 기본 디자인 */
+  .extension h2{
+    font-size: 1.8rem;
+    font-weight:700;
+  }
+  
+  /* section 기본 디자인: column */
+  .extension section{
+    width:100%; 
+    display: flex;
+    flex-direction: column;
+    justify-content:center;
+    align-items:center;
+    gap: 8px;
+    font-size: 1.4rem;
+  }
+  
+  /* article 기본 디자인: row */
+  .extension article{
+    display: flex;
+    justify-content:center;
+    align-items:center;
+    width: 100%;
+    gap: 2rem;
+  }
+  
+  /* ul 기본 디자인 */
+  .extension ul{
+    width: 100%;
+    list-style: none;
+    font-size: 1.4rem;
+  }
+  .extension li{
+    padding: 0.4rem 0;
+  }
+  .extension li:hover{
+    font-weight: 600;
+    color:#00bbaa;
+  }
+  
+  /* a 기본 디자인 */
+  .extension a{
+    color: #00bbaa;
+  }
+  .extension a:hover{
+    font-weight: 600;
+  }
+  
+  /* footer 기본 디자인 */
+  .extension footer{
+    border-top: 1px solid #aaaaaa;
+    width:100%;
+    padding: 1rem 2rem 0;
+    display:flex;
+    justify-content: space-between;
+    align-items: center;
+    font-size: 1.4rem;
+    gap: 1rem;
+  }
+  .extension footer a{
+    color: inherit;
+    text-decoration: none;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    flex-direction: column;
+  }
+  .extension footer a:hover{
+    color:#00bbaa;
+    text-decoration: underline;
+  }
+  
+  .extension textarea {
+    width: 100%;
+    height: 20rem;
+    border-radius: 1rem;
+    border: 1px solid #aaaaaa;
+  }
+  .extension input[type='text'] {
+    border-radius: 1rem;
+    width: 100%;
+    height: 3rem;
+    border: 1px solid #aaaaaa;
+  }
+  
+  [data-isChecked=false]{
+    color:#fa4D79;
+  }
+  [data-isChecked=true]{
+    color:#00bbaa;
+  }
+
+  /* dark theme 적용 */
+  .dark-theme{
+    color:white;
+    background-color:#222222;
+  }
+  .dark-theme textarea{
+    background-color: #222222;
+    color: white;
+  }
+  .dark-theme input{
+    background-color: #222222;
+    color: white;
+  }
+  
+  /* 특이 버튼 */
+  #theme-button{
+    position: absolute;
+    width: 3rem;
+    height: 3rem;
+    top: 1rem;
+    right: 1rem;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+  }
+  #option-button{
+    position: absolute;
+    width: 3rem;
+    height: 3rem;
+    top: 5rem;
+    right: 1rem;
+    display: flex;
+    justify-content: center;
+    align-items: center;    
+    border-radius: 1rem;
+    background-color: rgb(240,240,240);
+  }
+  #logout-button{
+    color: red;
+    width: 50px;
+    font-size: 1.3rem;
+    background-color: transparent;
+    text-decoration: underline;
+  }

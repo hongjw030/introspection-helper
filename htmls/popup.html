@@ -4,8 +4,7 @@
   <title>Dev Helper</title>
   <meta charset="UTF-8" />
   <meta http-equiv="x-ua-compatible" content="IE=edge" />
-  <link rel="stylesheet" href="../styles/global.css">
-  <link rel="stylesheet" href="../styles/popup.css">
+  <link rel="stylesheet" href="../styles/smallPage.css">
   <script type="module" src="../dist/popup.bundle.js"></script>
 </head>
 
@@ -31,16 +30,16 @@
         <span id="user-selectedRepo-span" class="highlighted"></span>
       </article>
       <article>
-        <a href="option.html">more options</a>
+        <a href="option.html" id="option-button"><img src="../assets/option.svg" width="20px" height="20px" /></a>
         <button id="logout-button" arial-role="logout" style="display:none;">Logout</button>
       </article>
 
       <article id="optional-habit-article" style="display: none;" data-isChecked="false"></article>
 
-      <div class="buttonList">
+      <article>
         <button id="save-button" class="button--secondary">save</button>
         <button id="reset-button" class="button--warning">reset</button>
-      </div>
+      </article>
 
       <textarea id="post-textarea" placeholder="type your introspection!"></textarea>
 
