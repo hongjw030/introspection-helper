@@ -180,9 +180,14 @@ html{
     background-color: rgb(240,240,240);
   }
   #logout-button{
-    color: red;
-    width: 50px;
-    font-size: 1.3rem;
-    background-color: transparent;
-    text-decoration: underline;
+    position: absolute;
+    width: 3rem;
+    height: 3rem;
+    top: 1rem;
+    left: 1rem;
+    display: flex;
+    justify-content: center;
+    align-items: center;    
+    border-radius: 1rem;
+    background-color: rgb(240,240,240);
   }
