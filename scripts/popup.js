@@ -256,6 +256,12 @@ function createFileAndCommit(token, repoName, fileName, content, nickname, commi
           chrome.storage.local.get('savedTemplate', (result)=>{
             const textarea = document.getElementById('post-textarea');
             textarea.value = result.savedTemplate ?? '';
+            chrome.storage.local.set({'submissionDate': SUBMISSION_DATE})
+            if(chrome.storage.local.get('habit')){
+              const habitSection = document.getElementById('optional-habit-article');
+              habitSection.setAttribute("data-isChecked", 'true')
+              habitSection.textContent = `${YEAR}년 ${MONTH}월 ${DAY}일 회고를 작성했어요! 💯`;
+            }
             alert("오늘의 회고를 작성했습니다!");
           })
         });
