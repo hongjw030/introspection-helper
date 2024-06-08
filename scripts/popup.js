@@ -17,7 +17,7 @@ const SUBMISSION_DATE = `${YEAR}${MONTH}${DAY}`;
 
 const CLIENT_ID = 'Ov23lisuJkODBkIrQm4e';
 const CLIENT_SECRET ='2483bad98853659aade58aa88f50b1a44765775a';
-// chrome.storage.local의 키: ['githubToken', 'selectedRepo', 'nickname', 'savedText', 'savedTemplate', 'habit', 'submissionDate', 'isLight', 'savedCommit']
+// chrome.storage.local의 키: ['githubToken', 'selectedRepo', 'nickname', 'savedText', 'savedTemplate', 'habit', 'submissionDate', 'isLight', 'savedCommitMessage']
 
 document.addEventListener('DOMContentLoaded', function() {
   const REDIRECT_URI = chrome.identity.getRedirectURL();
@@ -127,18 +127,19 @@ document.addEventListener('DOMContentLoaded', function() {
 
   // 제출 버튼 기능
   document.getElementById('submit-button').addEventListener('click', function() {
-    chrome.storage.local.get(['githubToken', 'selectedRepo', 'nickname'], function({githubToken, selectedRepo, nickname}) {
+    chrome.storage.local.get(['githubToken', 'selectedRepo', 'nickname', 'savedCommitMessage'], function({githubToken, selectedRepo, nickname, savedCommitMessage}) {
       const content = document.getElementById('post-textarea').value;
       const fileName = `${SUBMISSION_DATE}.md`;
-      createFileAndCommit(githubToken, selectedRepo, fileName, content, nickname);
+      const commitMessage = savedCommitMessage ?? 'Create new Markdown file'
+      createFileAndCommit(githubToken, selectedRepo, fileName, content, nickname, commitMessage);
     });
   });
 });
 
 // md 파일 커밋 함수
-function createFileAndCommit(token, repoName, fileName, content, nickname) {
+function createFileAndCommit(token, repoName, fileName, content, nickname, commitMessage='Create new Markdown file') {
 
-  function createFileInFolder(token, repoName, fileName, content, nickname, folderPath) {
+  function createFileInFolder(token, repoName, fileName, content, nickname, folderPath, commitMessage) {
     fetch(`https://api.github.com/repos/${nickname}/${repoName}/contents/${folderPath}`, {
       method: 'GET',
       headers: {
@@ -148,17 +149,17 @@ function createFileAndCommit(token, repoName, fileName, content, nickname) {
     .then(response => {
       if (response.status === 404) {
         // 폴더가 없으므로 생성
-        return createFolderAndFile(token, repoName, fileName, content, nickname, folderPath);
+        return createFolderAndFile(token, repoName, fileName, content, nickname, folderPath, commitMessage);
       } else {
         // 폴더가 이미 존재하므로 파일 생성
-        return createNewFile(token, repoName, fileName, content, nickname, folderPath);
+        return createNewFile(token, repoName, fileName, content, nickname, folderPath, commitMessage);
       }
     })
     .catch(error => {
     });
   }
 
-  function createFolderAndFile(token, repoName, fileName, content, nickname, folderPath) {
+  function createFolderAndFile(token, repoName, fileName, content, nickname, folderPath, commitMessage) {
     const folderName = folderPath.split('/').pop();
     const parentFolder = folderPath.split('/').slice(0, -1).join('/');
 
@@ -223,14 +224,14 @@ function createFileAndCommit(token, repoName, fileName, content, nickname) {
     })
     .then(() => {
       // 폴더 생성 후 파일 생성
-      return createNewFile(token, repoName, fileName, content, nickname, folderPath);
+      return createNewFile(token, repoName, fileName, content, nickname, folderPath, commitMessage);
     })
     .catch(error => {
       return;
     });
   }
 
-  function createNewFile(token, repoName, fileName, content, nickname, folderPath) {
+  function createNewFile(token, repoName, fileName, content, nickname, folderPath, commitMessage) {
     fetch(`https://api.github.com/repos/${nickname}/${repoName}/contents/${folderPath}/${fileName}`, {
       method: 'GET',
       headers: {
@@ -247,14 +248,16 @@ function createFileAndCommit(token, repoName, fileName, content, nickname) {
             'Content-Type': 'application/json'
           },
           body: JSON.stringify({
-            message: 'Create new Markdown file',
+            message: commitMessage,
             content: encodeBase64(content) // encode content to base64
           })
         }).then(()=>{
           chrome.storage.local.remove('savedText')
-          const textarea = document.getElementById('post-textarea');
-          textarea.value = '';
-          alert("오늘의 회고를 작성했습니다!");
+          chrome.storage.local.get('savedTemplate', (result)=>{
+            const textarea = document.getElementById('post-textarea');
+            textarea.value = result.savedTemplate ?? '';
+            alert("오늘의 회고를 작성했습니다!");
+          })
         });
       } else {
         // 파일이 이미 존재하므로 새 파일 이름을 입력받음
@@ -262,7 +265,7 @@ function createFileAndCommit(token, repoName, fileName, content, nickname) {
         if (newFileName) {
           // 사용자가 새 파일 이름을 입력한 경우 파일 생성 함수 재귀 호출
           let myFileName = newFileName + ".md";
-          return createNewFile(token, repoName, myFileName, content, nickname, folderPath);
+          return createNewFile(token, repoName, myFileName, content, nickname, folderPath, commitMessage);
         } else {
           // 사용자가 입력을 취소한 경우
           throw new Error('파일 이름 입력이 취소되었습니다.');
@@ -292,5 +295,5 @@ function createFileAndCommit(token, repoName, fileName, content, nickname) {
     });
   }
 
-  createFileInFolder(token, repoName, fileName, content, nickname, FOLDER_PATH);
+  createFileInFolder(token, repoName, fileName, content, nickname, FOLDER_PATH, commitMessage);
 }

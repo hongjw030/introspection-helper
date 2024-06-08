@@ -6,10 +6,10 @@ document.addEventListener('DOMContentLoaded', function() {
     if (result.savedTemplate) {
       document.getElementById('option-template-textarea').value = result.savedTemplate;
     }
-    if(result.savedCommit){
-      document.getElementById('option-commit-input').value = result.savedCommit;
+    if(result.savedCommitMessage){
+      document.getElementById('option-commit-input').value = result.savedCommitMessage;
     }
-    if(!result.savedCommit){
+    if(!result.savedCommitMessage){
       document.getElementById('option-commit-input').value = 'Create new Markdown file'
     }
     if(!result.isLight || result.isLight==='yes'){
@@ -58,7 +58,7 @@ document.addEventListener('DOMContentLoaded', function() {
       alert('커밋 메세지는 반드시 있어야 합니다.');
     }
     else{
-      chrome.storage.local.set({savedCommit: commitInput.value});
+      chrome.storage.local.set({savedCommitMessage: commitInput.value});
       alert("커밋 메세지가 저장되었습니다!");  
     }
     return;
@@ -66,7 +66,7 @@ document.addEventListener('DOMContentLoaded', function() {
 
   //커밋 리셋 버튼 기능
   document.getElementById('option-commit-reset-button').addEventListener('click', function(){
-    chrome.storage.local.remove(['savedCommit']);
+    chrome.storage.local.remove(['savedCommitMessage']);
     document.getElementById('option-commit-input').value = 'Create new Markdown file';
     alert("커밋 메세지를 초기화했습니다!");
   })
