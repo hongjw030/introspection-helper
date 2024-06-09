@@ -1,6 +1,6 @@
 {
   "manifest_version": 3,
-  "name": "Dev) Helper",
+  "name": "Introspection Helper",
   "version": "2.0.0",
   "description": "input에 회고를 작성하면, 마크다운 파일로 만들어 깃허브 레파지토리에 커밋해줍니다.",
   "author": "hongjw030",
@@ -22,8 +22,8 @@
     "service_worker": "dist/background.bundle.js"
   },
   "action": {
-    "default_icon": "assets/icons/dev32.png",
-    "default_title": "DEV) Helper",
+    "default_icon": "assets/icons/signature32.png",
+    "default_title": "Introspection Helper",
     "default_popup": "htmls/popup.html"
   },
   "options_page": "htmls/option.html",
@@ -35,11 +35,11 @@
     }
   ],
   "oauth2": {
-    "client_id": "Ov23lisuJkODBkIrQm4e",
+    "client_id": "Ov23liS8uJ1LJSioNTPc",
     "scopes": [
       "repo"
     ],
     "auth_url": "https://github.com/login/oauth/authorize",
-    "redirect_uri": "https://lfeklebbhdgpcnndldcpnppfopkloamf.chromiumapp.org/"
+    "redirect_uri": "https://gifbolfogdiniebgljncdinaehkciohk.chromiumapp.org/"
   }
 }

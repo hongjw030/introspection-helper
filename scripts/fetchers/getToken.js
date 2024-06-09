@@ -7,8 +7,8 @@ export async function getToken(code, redirectUri){
         'Content-Type': 'application/json'
       },
       body: JSON.stringify({
-        client_id: 'Ov23lisuJkODBkIrQm4e',
-        client_secret: '2483bad98853659aade58aa88f50b1a44765775a',
+        client_id: 'Ov23liS8uJ1LJSioNTPc',
+        client_secret: '904fcc78be315af16780349f2f74d701aeb3fd34',
         code: code,
         redirect_uri: redirectUri
       })
